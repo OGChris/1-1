@@ -141,7 +141,6 @@
     },
   };
 </script>
-
 <style>
 	/*
  * Globals

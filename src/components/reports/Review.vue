@@ -51,6 +51,9 @@
 								<li v-for="(step, index) in data.value" v-text="step.text"></li>
 							</ol>
 						</template>
+						<template slot="date" scope="data">
+							<template v-if="data.value">{{ data.value | mFormat('MMM DD') }}</template>
+						</template>
 					</b-table>
 					<p v-else>None Set</p>
 				</b-card-body>
@@ -134,7 +137,9 @@
             });
           });
         // Get Status Reports
-        this.$root.fbDatabase.collection('status_reports').where('report', '==', this.currentReport.id).get()
+        this.$root.fbDatabase.collection('status_reports')
+          .where('uid', '==', this.user.uid).where('week_of', '==', this.currentReport.data().week_of)
+          .get()
           .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
               this.status_reports.push(_.extend({ id: doc.id }, doc.data()));

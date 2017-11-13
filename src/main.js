@@ -21,6 +21,7 @@ import VueFire from 'vuefire';
 import VueFirestore from 'vue-firestore';
 import VueAutosize from 'vue-autosize';
 import $ from 'jquery';
+import moment from 'moment';
 import store from './store';
 import App from './App';
 import header from './components/shared/header';
@@ -46,6 +47,8 @@ Vue.use(VeeValidate);
 Vue.use(VueAutosize);
 
 Vue.component('shared-header', header);
+
+Vue.filter('mFormat', (value, format) => moment(value).format(format));
 
 // Vue.component('date-picker', datePicker);
 Vue.config.productionTip = false;

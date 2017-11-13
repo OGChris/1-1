@@ -70,7 +70,7 @@
 								<b-btn type="submit" variant="primary" :disabled="disableButton">
 									{{ currentReport ? 'Continue' : 'Begin'}}
 								</b-btn>
-								<b-btn :to="`reports/${weekOf}/review`" :disabled="disableButton || !currentReport">
+								<b-btn @click="toReview" :disabled="disableButton || !currentReport">
 									Review
 								</b-btn>
 							</b-input-group-button>
@@ -179,6 +179,7 @@
       },
       beginReport() {
         if (this.currentReport) {
+          localStorage.SelectedWeek = this.weekOf;
           this.$router.push(`reports/${this.weekOf}/wows`);
         } else {
           const data = {
@@ -193,28 +194,14 @@
           });
         }
       },
+      toReview() {
+        localStorage.SelectedWeek = this.weekOf;
+        this.$router.push(`reports/${this.weekOf}/review`);
+      },
     },
     mounted() {
 
     },
   };
 </script>
-<style>
-	h1, h2 {
-		font-weight: normal;
-	}
-
-	ul {
-		list-style-type: none;
-		padding: 0;
-	}
-
-	li {
-		display: inline-block;
-		margin: 0 10px;
-	}
-
-	a {
-		color: #35495E;
-	}
-</style>
+<style></style>
