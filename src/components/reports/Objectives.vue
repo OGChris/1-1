@@ -1,5 +1,5 @@
 <template>
-	<div class="offset-sm-2 col-sm-8 col-xs-12 align-self-center mt-5 mb-5">
+	<div class="offset-md-2 col-md-8 col-xs-12 align-self-center mt-5 mb-5">
 		<main id="objectives" role="main" class="inner cover">
 		<b-card title="Objectives" sub-title="I’m focused on..." header-text-variant="primary" class="mb-2">
 			<!--<b-card-group columns="'12'">-->
@@ -9,11 +9,17 @@
 					         :placeholder="`Objective ${index+1}`" v-validate.initial="'max:50'"
 					         :data-vv-name="`objective${index}`"
 					         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
-					<b-input-group-addon>
+					<b-input-group-button>
+						<b-button :pressed.sync="objective.completed" @change="updateCompletedTimestamp(index)" :variant="objective.completed ? 'success' : 'secondary'">
+							<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
+							<i class="fa" :class="[objective.completed ? 'fa-check' : 'fa-square-o']"></i>
+						</b-button>
+					</b-input-group-button>
+					<!--<b-input-group-addon>
 						<b-form-checkbox class="mb-0" v-model="objective.completed" @change="updateCompletedTimestamp(index)">
 							{{objective.completed ? 'Complete' : 'Incomplete'}}
 						</b-form-checkbox>
-					</b-input-group-addon>
+					</b-input-group-addon>-->
 				</b-input-group>
 			</b-form-group>
 
@@ -26,11 +32,17 @@
 					         :placeholder="`Objective ${index+1}`" v-validate.initial="'max:50'"
 					         :data-vv-name="`objective${index}`"
 					         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
-					<b-input-group-addon>
+					<b-input-group-button>
+						<b-button :pressed.sync="objective.completed" @change="updateCompletedTimestamp(index)" :variant="objective.completed ? 'success' : 'secondary'">
+							<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
+							<i class="fa" :class="[objective.completed ? 'fa-check' : 'fa-square-o']"></i>
+						</b-button>
+					</b-input-group-button>
+					<!--<b-input-group-addon>
 						<b-form-checkbox class="mb-0" v-model="objective.completed" @change="updateCompletedTimestamp(index)">
 							{{objective.completed ? 'Complete' : 'Incomplete'}}
 						</b-form-checkbox>
-					</b-input-group-addon>
+					</b-input-group-addon>-->
 					<!--<b-input-group-button>
 						<b-btn variant="danger" @click="hideObjective"><i class="fa fa-times"></i></b-btn>
 					</b-input-group-button>-->

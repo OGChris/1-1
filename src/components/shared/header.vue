@@ -4,7 +4,7 @@
 
 			<b-nav-toggle target="nav_collapse"></b-nav-toggle>
 
-			<b-navbar-brand href="/">Orange Gate 1:1</b-navbar-brand>
+			<b-navbar-brand href="/">1:1 Update</b-navbar-brand>
 
 			<b-collapse is-nav id="nav_collapse">
 
@@ -61,6 +61,14 @@
     },
     computed: mapState(['user']),
     methods: {
+      signOut() {
+        this.$root.fbAuth.signOut().then(() => {
+          // Sign-out successful.
+          window.location.reload();
+        }).catch(() => {
+          // An error happened.
+        });
+      },
       changeBackground(bg) {
         const html = $('html');
         html.css('background-image', `url("${this.$root.backgrounds[bg]}")`);

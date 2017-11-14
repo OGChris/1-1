@@ -1,5 +1,5 @@
 <template>
-	<div class="offset-sm-2 col-sm-8 col-xs-12 align-self-center mt-5 mb-5">
+	<div class="offset-md-2 col-md-8 col-xs-12 align-self-center mt-5 mb-5">
 		<main id="wows" role="main" class="inner cover">
 			<b-card title="Wows" sub-title="I'm so proud of..." header-text-variant="primary" class="mb-2">
 				<b-row v-for="(wow, index) in wows" class="mb-2" :key="wow.id || index">

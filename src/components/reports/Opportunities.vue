@@ -1,5 +1,5 @@
 <template>
-	<div class="offset-sm-2 col-sm-8 col-xs-12 align-self-center mt-5 mb-5">
+	<div class="offset-md-2 col-md-8 col-xs-12 align-self-center mt-5 mb-5">
 		<main id="opportunities" role="main" class="inner cover">
 			<b-card title="Opportunities" sub-title="Areas to improve..." header-text-variant="primary" class="mb-2">
 				<b-form-group v-for="(opp, index) in opportunities" class="mb-2" :key="opp.id || index">

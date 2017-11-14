@@ -1,5 +1,5 @@
 <template>
-	<div class="offset-sm-2 col-sm-8 col-xs-12 align-self-center mt-5">
+	<div class="offset-md-2 col-md-8 col-xs-12 align-self-center mt-5">
 		<main role="main" class="inner cover">
 			<div class="hello">
 				<template v-if="!user">
@@ -66,7 +66,7 @@
 							<b-input-group-addon><i class="fa fa-calendar"></i></b-input-group-addon>
 							<b-input id="reportWeek" type="week" v-model="weekOf" min="minWeek" max="maxWeek" required
 								v-validate="'required'" name="reportWeek" @input="weekChanged"></b-input>
-							<b-input-group-button>
+							<b-input-group-button class="d-none d-md-block">
 								<b-btn type="submit" variant="primary" :disabled="disableButton">
 									{{ currentReport ? 'Continue' : 'Begin'}}
 								</b-btn>
@@ -75,6 +75,15 @@
 								</b-btn>
 							</b-input-group-button>
 						</b-input-group>
+
+						<b-btn-group class="d-md-none" size="lg">
+							<b-btn type="submit" variant="primary" :disabled="disableButton">
+								{{ currentReport ? 'Continue' : 'Begin'}}
+							</b-btn>
+							<b-btn @click="toReview" :disabled="disableButton || !currentReport">
+								Review
+							</b-btn>
+						</b-btn-group>
 					</b-form>
 
 				</template>

@@ -109,14 +109,6 @@
           onComplete: done,
         });
       },
-      signOut() {
-        this.$root.fbAuth.signOut().then(() => {
-          // Sign-out successful.
-          window.location.reload();
-        }).catch(() => {
-          // An error happened.
-        });
-      },
       // Modal functions
       hideModal() {
         this.$root.$emit('bv::hide::modal', 'historyModal');
@@ -210,7 +202,7 @@
 
 	/* Padding for spacing */
 	.inner {
-		padding: 2rem;
+		/*padding: 2rem;*/
 	}
 
 	/*
@@ -233,11 +225,11 @@
 	 */
 
 	.cover {
-		padding: 0 1.5rem;
+		/*padding: 0 1.5rem;*/
 	}
 
 	.cover .btn-lg {
-		padding: .75rem 1.25rem;
+		/*padding: .75rem 1.25rem;*/
 		font-weight: 700;
 	}
 
