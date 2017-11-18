@@ -1,15 +1,18 @@
 <template>
 	<header class="masthead clearfix" style="z-index: 999;">
-		<b-navbar fixed="top" toggleable="md" type="light" variant="info" class="custom-navbar">
+		<b-navbar fixed="top" toggleable="md" type="light" variant="light" class="custom-navbar">
 
 			<b-nav-toggle target="nav_collapse"></b-nav-toggle>
 
-			<b-navbar-brand href="/">1:1 Update</b-navbar-brand>
+			<b-navbar-brand href="/">
+				<img src="../../assets/OGC_Logo-Orange-long.png" class="d-inline-block align-middle" height="32" alt="Orange Gate"> <span class="d-inline-block align-middle">1:1 Update</span>
+			</b-navbar-brand>
 
 			<b-collapse is-nav id="nav_collapse">
 
 				<b-navbar-nav>
 					<b-nav-item to="Hello">Home</b-nav-item>
+					<b-nav-item :active="$route.path.indexOf('admin')!==-1" v-if="$root.isAdmin" to="admin">Admin</b-nav-item>
 				</b-navbar-nav>
 
 				<!-- Right aligned nav items -->
@@ -27,24 +30,27 @@
 						<template slot="button-content">
 							<i class="fa fa-cog fa-2x"></i>
 						</template>
-						<b-dropdown-item disabled>Profile</b-dropdown-item>
+						<!--<b-dropdown-item disabled>Profile</b-dropdown-item>-->
 						<b-dropdown-header>Change Background</b-dropdown-header>
-						<b-dropdown-item :class="{ 'active': activeBackground === 'fall' }" @click="changeBackground('fall')">Fall</b-dropdown-item>
-						<b-dropdown-item :class="{ 'active': activeBackground === 'bokeh' }" @click="changeBackground('bokeh')">Light Bokeh</b-dropdown-item>
-						<b-dropdown-item :class="{ 'active': activeBackground === 'clouds' }" @click="changeBackground('clouds')">Clouds</b-dropdown-item>
-						<b-dropdown-item :class="{ 'active': activeBackground === 'wood' }" @click="changeBackground('wood')">Wooden Table</b-dropdown-item>
+						<b-dropdown-item :class="{ 'active': activeBackground === 'bg1' }" @click="changeBackground('bg1')">Background 1</b-dropdown-item>
+						<b-dropdown-item :class="{ 'active': activeBackground === 'bg2' }" @click="changeBackground('bg2')">Background 2</b-dropdown-item>
+						<b-dropdown-item :class="{ 'active': activeBackground === 'bg3' }" @click="changeBackground('bg3')">Background 3</b-dropdown-item>
+						<b-dropdown-item :class="{ 'active': activeBackground === 'bg4' }" @click="changeBackground('bg4')">Background 4</b-dropdown-item>
 					</b-nav-item-dropdown>
 
 					<b-nav-item v-if="user" title="Sign Out" @click.stop.prevent="signOut" v-b-tooltip.hover.bottom>
 						<i class="fa fa-sign-out fa-2x"></i>
 					</b-nav-item>
 				</b-navbar-nav>
-
 			</b-collapse>
 		</b-navbar>
 	</header>
 </template>
-<style></style>
+<style>
+	.custom-navbar {
+		/*background: rgba(255, 255, 255, 1) !important;*/
+	}
+</style>
 <script type="text/javascript">
   import $ from 'jquery';
   import { mapState } from 'vuex';
@@ -56,7 +62,7 @@
     data() {
       return {
         avatar: defaultAvatar,
-        activeBackground: localStorage.SelectedBackground || 'fall',
+        activeBackground: localStorage.SelectedBackground || 'bg1',
       };
     },
     computed: mapState(['user']),

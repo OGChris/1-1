@@ -41,17 +41,17 @@
 								class="fa fa-edit"></i> Edit
 						</b-btn>
 					</h4>
-					<b-table v-if="status_reports.length" head-variant="dark" striped hover :items="status_reports"
+					<b-table responsive v-if="status_reports.length" head-variant="dark" striped hover :items="status_reports"
 					         :fields="['item', 'stage', 'status', 'next_steps', 'who', 'date']">
-						<template slot="stage" scope="data">
+						<template slot="stage" slot-scope="data">
 							{{ getStageObject(data.value).name }}
 						</template>
-						<template slot="next_steps" scope="data">
+						<template slot="next_steps" slot-scope="data">
 							<ol>
 								<li v-for="(step, index) in data.value" v-text="step.text"></li>
 							</ol>
 						</template>
-						<template slot="date" scope="data">
+						<template slot="date" slot-scope="data">
 							<template v-if="data.value">{{ data.value | mFormat('MMM DD') }}</template>
 						</template>
 					</b-table>

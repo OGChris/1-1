@@ -47,7 +47,7 @@
     methods: {
       addOpportunity() {
         const obj = {
-          // report: this.currentReport.ref.path,
+          uid: this.user.uid,
           report: this.currentReport.id,
           text: '',
         };

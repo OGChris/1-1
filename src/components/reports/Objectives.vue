@@ -2,25 +2,19 @@
 	<div class="offset-md-2 col-md-8 col-xs-12 align-self-center mt-5 mb-5">
 		<main id="objectives" role="main" class="inner cover">
 		<b-card title="Objectives" sub-title="I’m focused on..." header-text-variant="primary" class="mb-2">
-			<!--<b-card-group columns="'12'">-->
 			<b-form-group v-for="(objective, index) in objectives" :key="objective.id || index">
 				<b-input-group>
-					<b-input type="text" v-model="objective.text" @input="debouncedUpdate(objective)"
-					         :placeholder="`Objective ${index+1}`" v-validate.initial="'max:50'"
-					         :data-vv-name="`objective${index}`"
-					         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
-					<b-input-group-button>
-						<b-button :pressed.sync="objective.completed" @change="updateCompletedTimestamp(index)" :variant="objective.completed ? 'success' : 'secondary'">
-							<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
-							<i class="fa" :class="[objective.completed ? 'fa-check' : 'fa-square-o']"></i>
-						</b-button>
-					</b-input-group-button>
-					<!--<b-input-group-addon>
-						<b-form-checkbox class="mb-0" v-model="objective.completed" @change="updateCompletedTimestamp(index)">
-							{{objective.completed ? 'Complete' : 'Incomplete'}}
-						</b-form-checkbox>
-					</b-input-group-addon>-->
-				</b-input-group>
+						<b-input type="text" v-model="objective.text" @input="debouncedUpdate(objective)"
+						         :placeholder="`Objective ${index+1}`" v-validate.initial="'max:50'"
+						         :data-vv-name="`objective${index}`"
+						         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
+						<b-input-group-button>
+							<b-button :pressed.sync="objective.completed" @change="updateCompletedTimestamp(index)" :variant="objective.completed ? 'success' : 'secondary'">
+								<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
+								<i class="fa" :class="[objective.completed ? 'fa-check-square-o' : 'fa-square-o']"></i>
+							</b-button>
+						</b-input-group-button>
+					</b-input-group>
 			</b-form-group>
 
 			<hr>
@@ -35,22 +29,13 @@
 					<b-input-group-button>
 						<b-button :pressed.sync="objective.completed" @change="updateCompletedTimestamp(index)" :variant="objective.completed ? 'success' : 'secondary'">
 							<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
-							<i class="fa" :class="[objective.completed ? 'fa-check' : 'fa-square-o']"></i>
+							<i class="fa" :class="[objective.completed ? 'fa-check-square-o' : 'fa-square-o']"></i>
 						</b-button>
 					</b-input-group-button>
-					<!--<b-input-group-addon>
-						<b-form-checkbox class="mb-0" v-model="objective.completed" @change="updateCompletedTimestamp(index)">
-							{{objective.completed ? 'Complete' : 'Incomplete'}}
-						</b-form-checkbox>
-					</b-input-group-addon>-->
-					<!--<b-input-group-button>
-						<b-btn variant="danger" @click="hideObjective"><i class="fa fa-times"></i></b-btn>
-					</b-input-group-button>-->
 				</b-input-group>
+				<small class="form-text text-muted text-left" v-text="getReport(objective.report).week_of"></small>
 			</b-form-group>
 
-
-			<!--</b-card-group>-->
 			<div slot="footer">
 				<b-row class="justify-content-md-center">
 					<b-col cols="6" class="text-left">
@@ -76,6 +61,7 @@
     data() {
       return {
         objectives: [],
+        reports: [],
         previousObjectives: [],
       };
     },
@@ -89,6 +75,9 @@
       },
     },
     methods: {
+      getReport(report) {
+        return _.findWhere(this.reports, { id: report });
+      },
       addObjective() {
         const obj = {
           // report: this.currentReport.ref.path,
@@ -126,6 +115,18 @@
           });
       }, 250),
       loadCurrentData() {
+        // get reports to correlate to objectives
+        this.$root.fbDatabase.collection('reports')
+          .where('uid', '==', this.user.uid)
+          .get()
+          .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              this.reports.push(_.extend({ id: doc.id }, doc.data()));
+            });
+          })
+          .catch((error) => {
+            console.log('Error getting document: ', error);
+          });
         // get/create objectives for the current report
         this.$root.$firestore.objectives = this.$root.fbDatabase.collection('objectives')
           .where('report', '==', this.currentReport.id)

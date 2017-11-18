@@ -12,6 +12,14 @@ import Opportunities from '@/components/reports/Opportunities';
 import StatusReports from '@/components/reports/StatusReports';
 import Review from '@/components/reports/Review';
 
+// Admin Components
+import AdminWrapper from '@/components/admin/wrapper';
+import AdminDashboard from '@/components/admin/dashboard';
+import AdminWows from '@/components/admin/wows';
+import AdminObjectives from '@/components/admin/objectives';
+import AdminOpportunities from '@/components/admin/opportunities';
+import AdminStatusReports from '@/components/admin/status-reports';
+
 Vue.use(Router);
 // eslint-disable-next-line import/no-mutable-exports,prefer-const
 let router = new Router({
@@ -74,6 +82,41 @@ let router = new Router({
       ],
     },
     {
+      path: '/admin',
+      component: AdminWrapper,
+      children: [
+        {
+          path: '',
+          name: 'Dashboard',
+          component: AdminDashboard,
+        },
+        {
+          path: 'wows',
+          name: 'WOWs',
+          component: AdminWows,
+        },
+        {
+          path: 'objectives',
+          name: 'Objectives',
+          component: AdminObjectives,
+        },
+        {
+          path: 'opportunities',
+          name: 'Opportunities',
+          component: AdminOpportunities,
+        },
+        {
+          path: 'status-reports',
+          name: 'Status Reports',
+          component: AdminStatusReports,
+        },
+      ],
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
+    },
+    {
       path: '/auth',
       name: 'Authentication',
       component: Auth,
@@ -84,7 +127,7 @@ let router = new Router({
 router.beforeEach((to, from, next) => {
   let currentUser = window.firebaseApp.auth().currentUser;
   let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-
+  // requiresAdmin
   if (requiresAuth && !currentUser) next('/');
   else if (!requiresAuth && currentUser) next();
   else next();

@@ -9,7 +9,7 @@
 		<b-modal id="historyModal" title="View History" size="lg" ok-only ok-title="Close">
 			<template v-if="activeHistory.length">
 				<h4 v-text="`${activeHistory[0].item} Timeline`"></h4>
-				<b-table small head-variant="dark" striped hover :items="activeHistory"
+				<b-table responsive small head-variant="dark" striped hover :items="activeHistory"
 				         :fields="['stage', 'status', 'next_steps', 'who', 'date', 'week_of']">
 					<template slot="stage" scope="data">
 						{{ getStageObject(data.value).name }}
@@ -60,14 +60,19 @@
       },
     },
     beforeCreate() {
+      const self = this;
       Firebase.auth().onAuthStateChanged((user) => {
         // initially user = null, after auth it will be either <fb_user> or false
-        this.$store.commit('setUser', user || false);
+        self.$store.commit('setUser', user || false);
         if (user) {
+          // get user metadata, check for admin
+          self.$root.fbDatabase.collection('users').doc(user.uid).get().then((doc) => {
+            self.$root.isAdmin = doc.data().admin;
+          });
           // get current report for user filter by week first to limit results then filter by uid
-          this.$root.fbDatabase.collection('reports')
+          self.$root.fbDatabase.collection('reports')
             .where('week_of', '==', localStorage.SelectedWeek || moment().format('YYYY-[W]ww'))
-            .where('uid', '==', this.user.uid).limit(1)
+            .where('uid', '==', user.uid).limit(1)
             .get()
             .then((querySnapshot) => {
               querySnapshot.forEach((doc) => {
@@ -133,7 +138,9 @@
     },
   };
 </script>
-<style>
+<style lang="scss">
+	@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400');
+
 	/*
  * Globals
  */
@@ -145,7 +152,7 @@
 	html {
 		height: 100%;
 		/*overflow-y: hidden;*/
-		background-image: url('assets/fall.jpg');
+		background-image: url('assets/bg1.jpg');
 		background-color: transparent;
 		background-size: cover;
 		background-position: center center;
@@ -153,20 +160,17 @@
 	}
 	html,
 	body {
+		font-family: 'Open Sans', sans-serif;
+		font-weight: 300;
 		min-height: 100%;
 		height: -webkit-fill-available;
 		height: -moz-fill-available;
-		/*background-attachment: fixed;*/
-		/*background: url("data:image/png;base64,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") repeat;*/
-		/*background-color: #333;*/
 	}
 
 	body {
-		/*color: #fff;*/
-		/*background-color: rgba(255, 255, 255, .5);*/
+		color: #333333;
 		background: transparent;
 		text-align: center;
-		/*text-shadow: 0 .05rem .1rem rgba(0,0,0,.5);*/
 	}
 
 	.app-root {
@@ -187,7 +191,6 @@
 		width: 100%;
 		height: 100%; /* For at least Firefox */
 		min-height: 100%;
-		/*box-shadow: inset 0 0 5rem rgba(0,0,0,.5);*/
 	}
 
 	.site-wrapper-inner {
@@ -208,9 +211,8 @@
 	/*
 	 * Header
 	 */
+	h1 {
 
-	.custom-navbar {
-		background: rgba(255, 255, 255, .5) !important;
 	}
 
 	.active-animation {

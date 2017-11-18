@@ -10,8 +10,11 @@
 								<b-col cols="9">
 									<b-btn block @click="toggleCollapse(index)" variant="dark">{{ sp.item || `Status Report ${index+1}`}}</b-btn>
 								</b-col>
-								<b-col col="3">
-									<b-btn :disabled="!sp.item" block variant="primary" @click="loadHistory(sp)">View History</b-btn>
+								<b-col cols="3">
+									<b-btn-group>
+										<b-btn :disabled="!sp.item" variant="primary" @click="loadHistory(sp)">View History</b-btn>
+										<b-btn variant="danger" @click="deleteStatusReport(sp)"><i class="fa fa-close"></i></b-btn>
+									</b-btn-group>
 								</b-col>
 							</b-row>
 						</b-card-header>
@@ -20,11 +23,15 @@
 								<div :data-vv-scope="`rep${index}`">
 									<b-row>
 										<b-col>
-											<b-form-group>
-												<label for="sp-name">Item Name</label>
+											<b-form-group horizontal label="Name">
 												<b-input type="text" id="sp-name" v-model="sp.item" @input="debouncedUpdate(sp)"
 												         v-validate.initial="'max:40'" :data-vv-name="`item${index}`":state="errors.has(`item${index}`, `rep${index}`)?'invalid':''"
 												         :placeholder="`Status Report Item ${index+1}`" :data-vv-scope="`rep${index}`"></b-input>
+											</b-form-group>
+											<b-form-group horizontal label="Status">
+												<b-select id="sp-name" :options="['Planned', 'In Progress', 'On Hold', 'Complete']" v-model="sp.status" @input="debouncedUpdate(sp)"
+												          v-validate="'required|min:1'" :data-vv-name="`status${index}`" :state="errors.has(`status${index}`, `rep${index}`)?'invalid':''"
+												          placeholder="Item Status" :data-vv-scope="`rep${index}`"></b-select>
 											</b-form-group>
 										</b-col>
 										<b-col>
@@ -44,44 +51,50 @@
 											</b-form-group>
 										</b-col>
 									</b-row>
-									<b-form-group>
-										<label for="sp-name">Status</label>
-										<b-select id="sp-name" :options="['Planned', 'In Progress', 'On Hold', 'Complete']" v-model="sp.status" @input="debouncedUpdate(sp)"
-										          v-validate="'required|min:1'" :data-vv-name="`status${index}`" :state="errors.has(`status${index}`, `rep${index}`)?'invalid':''"
-										          placeholder="Item Status" :data-vv-scope="`rep${index}`"></b-select>
-									</b-form-group>
+
 									<b-form-group>
 										<label for="sp-name">Next Steps</label>
-										<b-input-group v-for="(step, stepIndex) in sp.next_steps" class="mb-2" :key="index" :left="`${stepIndex+1}`">
-											<b-input type="text" v-model="step.text" @input="debouncedUpdate(sp)" :placeholder="`Step ${stepIndex+1}`"
-											            v-validate.initial="'max:60'" :data-vv-scope="`rep${index}`" :data-vv-name="`step${stepIndex}${index}`" :state="errors.has(`step${stepIndex}${index}`, `rep${index}`)?'invalid':''"></b-input>
-											<b-input-group-button slot="right">
-												<b-btn variant="danger" @click="deleteStep(sp.next_steps, index)"><i class="fa fa-times"></i></b-btn>
-											</b-input-group-button>
-										</b-input-group>
+										<b-card class="mb-2" v-for="(step, stepIndex) in sp.next_steps" :key="index">
+											<b-input-group class="mb-2" :left="`${stepIndex+1}`">
+												<b-input type="text" v-model="step.text" @input="debouncedUpdate(sp)" :placeholder="`Step ${stepIndex+1}`"
+												         v-validate.initial="'max:60'" :data-vv-scope="`rep${index}`" :data-vv-name="`step${stepIndex}${index}`" :state="errors.has(`step${stepIndex}${index}`, `rep${index}`)?'invalid':''"></b-input>
+												<b-input-group-button slot="right">
+													<b-btn variant="danger" @click="deleteStep(sp.next_steps, index)"><i class="fa fa-times"></i></b-btn>
+												</b-input-group-button>
+											</b-input-group>
+											<b-row>
+												<b-col>
+													<b-form-group horizontal label="Who">
+														<v-select multiple v-model="step.who" @input="debouncedUpdate(sp)" :options="whoOptions" :data-vv-scope="`rep${index}`" v-validate="'required|min:1'" :data-vv-name="`who${index}`" :state="errors.has(`who${index}`, `rep${index}`)?'invalid':''"></v-select>
+													</b-form-group>
+												</b-col>
+												<b-col>
+													<b-form-group horizontal label="Due Date">
+														<b-input type="date" v-model="step.due_date" @input="debouncedUpdate(sp)" :data-vv-scope="`rep${index}`"
+														         v-validate="'required|min:1'" :data-vv-name="`date${index}`" :state="errors.has(`date${index}`, `rep${index}`)?'invalid':''"></b-input>
+													</b-form-group>
+												</b-col>
+											</b-row>
+										</b-card>
 										<b-btn block variant="outline-secondary" @click="sp.next_steps.push({ text: '' })"><i class="fa fa-plus"></i> Add Step</b-btn>
-
 									</b-form-group>
 
 									<b-row>
 										<b-col>
 											<b-form-group>
 												<label :for="`sp-who-${index}`">Who</label>
-												<b-select :id="`sp-who-${index}`" :options="['JR', 'KP', 'OT', 'GD', 'AK', 'NL', 'YE', 'EW', 'KF', 'TL', 'LS', 'HV', 'KR']"
-												          v-model="sp.who" @input="debouncedUpdate(sp)" :data-vv-scope="`rep${index}`"
-												          v-validate="'required|min:1'" :data-vv-name="`who${index}`" :state="errors.has(`who${index}`, `rep${index}`)?'invalid':''"></b-select>
+												<v-select :id="`sp-who-${index}`" v-model="sp.who" @input="debouncedUpdate(sp)" :options="whoOptions" :data-vv-scope="`rep${index}`" v-validate="'required|min:1'" :data-vv-name="`who${index}`" :state="errors.has(`who${index}`, `rep${index}`)?'invalid':''"></v-select>
 											</b-form-group>
 										</b-col>
 										<b-col>
 											<b-form-group>
-												<label for="">Due Date</label>
-												<b-input type="date" v-model="sp.date" @input="debouncedUpdate(sp)" :data-vv-scope="`rep${index}`"
+												<label :for="`sp-due-${index}`">Due Date</label>
+												<b-input :id="`sp-due-${index}`" type="date" v-model="sp.date" @input="debouncedUpdate(sp)" :data-vv-scope="`rep${index}`"
 												         v-validate="'required|min:1'" :data-vv-name="`date${index}`" :state="errors.has(`date${index}`, `rep${index}`)?'invalid':''"></b-input>
 											</b-form-group>
 										</b-col>
 									</b-row>
 								</div>
-
 							</b-card-body>
 						</b-collapse>
 					</b-card>
@@ -124,6 +137,7 @@
           { name: 'Deliver', code: 'D4', value: '5' },
           { name: 'Close', code: 'C', value: '6' },
         ],
+        whoOptions: ['JR', 'KP', 'OT', 'GD', 'AK', 'NL', 'YE', 'EW', 'KF', 'TL', 'LS', 'HV', 'KR'],
       };
     },
     computed: mapState(['user', 'currentReport']),
@@ -153,7 +167,11 @@
           stage: null,
           uid: this.user.uid,
           status: null,
-          next_steps: [{ text: '' }, { text: '' }, { text: '' }],
+          next_steps: [
+            { text: '', who: null, due_date: null },
+            { text: '', who: null, due_date: null },
+            { text: '', who: null, due_date: null },
+          ],
           who: null,
           date: null,
           week_of: this.currentReport.data().week_of,
@@ -197,8 +215,8 @@
           batch.commit().catch((error) => {
             console.log('Synchronization failed: ', error);
           });
-          console.log(doc.data().week_of);
-          console.log(this.currentReport.data().week_of);
+          // console.log(doc.data().week_of);
+          // console.log(this.currentReport.data().week_of);
         });
         // spCollection.doc(statusReport.id).update(item)
         //  .catch((error) => {
@@ -257,6 +275,11 @@
             this.$root.$emit('HistoryModal:SET', this.activeHistory);
             this.$root.$emit('bv::show::modal', 'historyModal');
           });
+      },
+      deleteStatusReport(sp) {
+        this.$root.fbDatabase.collection('status_reports').doc(sp.id).delete().then(() => {
+          this.status_reports = _.reject(this.status_reports, statRep => statRep.id === sp.id);
+        });
       },
     },
     mounted() {

@@ -7,13 +7,14 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'font-awesome/css/font-awesome.min.css';
 
-import * as clouds from '@/assets/clouds.jpg';
-import * as fall from '@/assets/fall.jpg';
-import * as bokeh from '@/assets/light-bokeh.jpg';
-import * as wood from '@/assets/wood.jpg';
+import * as bg1 from '@/assets/bg1.jpg';
+import * as bg2 from '@/assets/bg2.jpg';
+import * as bg3 from '@/assets/bg3.jpg';
+import * as bg4 from '@/assets/bg4.jpg';
 
 import Vue from 'vue';
 import Vuex from 'vuex';
+import vSelect from 'vue-select';
 import VeeValidate from 'vee-validate';
 import BootstrapVue from 'bootstrap-vue';
 // import Firebase from 'firebase';
@@ -30,6 +31,7 @@ import router from './router';
 import firebaseConfig from './firebase';
 
 const Firebase = require('firebase');
+
 // Required for side-effects
 require('firebase/firestore');
 
@@ -46,6 +48,7 @@ Vue.use(BootstrapVue);
 Vue.use(VeeValidate);
 Vue.use(VueAutosize);
 
+Vue.component('v-select', vSelect);
 Vue.component('shared-header', header);
 
 Vue.filter('mFormat', (value, format) => moment(value).format(format));
@@ -84,6 +87,7 @@ fbAuth.onAuthStateChanged(() => {
           fbAuth,
           fbDatabase: db,
           user: null,
+          isAdmin: false,
           collection: {
             weekOf: null,
             wows: [],
@@ -92,13 +96,13 @@ fbAuth.onAuthStateChanged(() => {
             notes: [],
             statusReports: [],
           },
-          backgrounds: { fall, bokeh, clouds, wood },
+          backgrounds: { bg1, bg2, bg3, bg4 },
         };
       },
       mounted() {
         // this.user = this.fbAuth.currentUser;
         if (localStorage.SelectedBackground) {
-          $('html').css('background-image', `url("${this.$root.backgrounds[localStorage.SelectedBackground || 'fall']}")`);
+          $('html').css('background-image', `url("${this.$root.backgrounds[localStorage.SelectedBackground || 'bg1']}")`);
         }
       },
     });
