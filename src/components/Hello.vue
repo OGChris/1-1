@@ -6,8 +6,13 @@
 					<h1 class="text-white">{{ heading }}</h1>
 					<template v-if="showAvatarLogin">
 						<b-card title="Select your Avatar">
-							<b-form id="avatar-login" @submit.prevent="">
+							<b-btn variant="outline-primary" class="m-1" v-for="(avatar, key) in avatars" :key="key" @click="loginAvatarSelected(key)">
+								<b-img :src="avatar" rounded="circle" width="50" height="50" blank-color="#777" alt="img" class="m-1" />
+								<br>{{ key }}
+							</b-btn>
+							<!--<b-form id="avatar-login" @submit.prevent="">
 								<b-form-group>
+
 									<b-form-radio-group id="avatars-login" buttons button-variant="outline-primary"
 									                    style="flex-wrap: wrap;justify-content: center;"
 									                    v-model="registerData.photoURL" name="avatars" required>
@@ -17,12 +22,12 @@
 										</b-form-radio>
 									</b-form-radio-group>
 								</b-form-group>
-							</b-form>
+							</b-form>-->
 
-							<div class="text-center">
+							<!--<div class="text-center">
 								<p class="text-center">If you do not see your avatar</p>
 								<b-btn variant="secondary">Login with email and password</b-btn>
-							</div>
+							</div>-->
 
 
 						</b-card>
@@ -79,6 +84,53 @@
 							</b-tabs>
 						</b-card>
 					</template>
+
+					<b-modal ref="avatarLoginModal" title="Authentication" @ok="login">
+						<div v-if="selectedLoginAvatar">
+							<img :src="selectedLoginAvatar && selectedLoginAvatar.photoURL ? selectedLoginAvatar.photoURL : defaultAvatar" height="32" class="rounded-circle"
+							     alt="Avatar">
+							&nbsp;
+							{{selectedLoginAvatar.displayName || selectedLoginAvatar.email}}
+						</div>
+						<b-form id="login" data-vv-scope="login">
+							<b-form-group id="login-password-group" label-for="login-password">
+								<b-form-input ref="focusThis" v-model="loginData.password" id="login-password" type="password"
+								              placeholder="Enter your password"></b-form-input>
+							</b-form-group>
+						</b-form>
+					</b-modal>
+
+					<b-modal ref="avatarRegisterModal" title="Register" @shown="$refs.focusThis.focus()" @ok="register">
+						<b-form id="register" data-vv-scope="register">
+							<b-form-group id="register-name-group" label-for="register-name" class="text-left">
+								<label for="register-name">Enter your name</label>
+								<b-form-input v-model="registerData.displayName" id="register-name" type="text"
+								              required placeholder="Jane Doe"></b-form-input>
+							</b-form-group>
+							<b-form-group id="register-email-group" label-for="register-email" class="text-left">
+								<label for="register-email">Enter your email</label>
+								<b-form-input v-model="registerData.email" id="register-email" type="email"
+								              required placeholder="abc@orangegate.ca"></b-form-input>
+							</b-form-group>
+							<b-form-group id="register-password-group" label-for="register-password" class="text-left">
+								<label for="register-password">Enter your password</label>
+								<b-form-input v-model="registerData.password" id="register-password"
+								              type="password" required
+								              placeholder="******"></b-form-input>
+							</b-form-group>
+							<!--<b-form-group>
+								<label for="radios2">Select your Avatar</label>
+								<b-form-radio-group id="radios2" buttons button-variant="outline-primary"
+								                    style="flex-wrap: wrap;justify-content: center;"
+								                    v-model="registerData.photoURL" name="avatars" required>
+									<b-form-radio v-for="(avatar, key) in avatars" :key="key" :value="avatar">
+										<b-img :src="avatar" rounded="circle" width="50" height="50" blank-color="#777" alt="img" class="m-1" />
+									</b-form-radio>
+								</b-form-radio-group>
+							</b-form-group>-->
+							<!--<b-button type="submit" variant="primary">Register</b-button>-->
+						</b-form>
+					</b-modal>
 
 				</template>
 				<template v-else>
@@ -143,7 +195,7 @@
     data() {
       return {
         loading: false,
-        showAvatarLogin: false,
+        showAvatarLogin: true,
         disableButton: false,
         heading: 'Welcome to 1:1',
         minWeek: moment().subtract(1, 'weeks').format('YYYY-[W]ww'),
@@ -162,6 +214,7 @@
         // eslint-disable-next-line max-len
         avatars: { Andrea, Ethan, Ginny, Harpreet, Janneke, Keerththana, Keyan, Kriska, Lee, Nayeon, Ozge, Tom, Ysabel, Jerez: defaultAvatar },
         loginAvatars: [],
+        selectedLoginAvatar: null,
       };
     },
     computed: mapState(['user', 'currentReport']),
@@ -175,8 +228,18 @@
         });
       },
       loginAvatarSelected(key) {
-        console.log(key);
-        debugger;
+        // eslint-disable-next-line max-len
+        const account = _.find(this.loginAvatars, user => (user.displayName && user.displayName.includes(key)) || (user.photoURL && user.photoURL.includes(key)));
+        if (account) {
+          this.selectedLoginAvatar = account;
+          this.loginData.email = account.email;
+          this.$refs.avatarLoginModal.show();
+          // Ask for password
+        } else {
+          this.registerData.displayName = key;
+          this.registerData.photoURL = this.avatars[key];
+          this.$refs.avatarRegisterModal.show();
+        }
       },
       login() {
         const self = this;
