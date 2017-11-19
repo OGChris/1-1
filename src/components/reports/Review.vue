@@ -64,7 +64,12 @@
 								<b-dropdown variant="info" right text="Export 1:1">
 									<b-dropdown-item @click="exportAs('xml')">XML</b-dropdown-item>
 									<b-dropdown-item @click="exportAs('json')">JSON</b-dropdown-item>
-									<b-dropdown-item disabled @click="exportAs('CSV')">CSV</b-dropdown-item>
+									<b-dropdown-header>CSV</b-dropdown-header>
+									<b-dropdown-item @click="exportAs('csv', 'wows')">WOWs</b-dropdown-item>
+									<b-dropdown-item @click="exportAs('csv', 'objectives')">Objectives</b-dropdown-item>
+									<b-dropdown-item @click="exportAs('csv', 'opportunities')">Opportunities</b-dropdown-item>
+									<b-dropdown-item @click="exportAs('csv', 'status-reports')">Status Reports</b-dropdown-item>
+									<b-dropdown-divider></b-dropdown-divider>
 									<b-dropdown-item disabled @click="exportAs('print')">Print</b-dropdown-item>
 								</b-dropdown>
 								<b-btn variant="outline-info" to="Home">Restart</b-btn>
@@ -78,9 +83,12 @@
 </template>
 <style></style>
 <script type="text/javascript">
+  /* eslint-disable no-case-declarations */
+
   import _ from 'underscore';
   import moment from 'moment';
   import FileSaver from 'file-saver';
+  import ToCSV from 'json2csv';
   import converter from 'xml-js';
   import { mapState } from 'vuex';
 
@@ -146,8 +154,9 @@
             });
           });
       },
-      exportAs(type) {
+      exportAs(type, spec) {
         let blob;
+        const blobs = {};
         const reportObj = _.extend({ id: this.currentReport.id }, this.currentReport.data());
         const weekMoment = moment(reportObj.week_of, 'YYYY-[W]ww');
         // build js object
@@ -184,6 +193,40 @@
           case 'json':
             blob = new Blob([JSON.stringify(object)], { type: 'text/plain;charset=utf-8' });
             FileSaver.saveAs(blob, `${this.user.displayName} ${reportObj.week_of}.json`);
+            break;
+            // eslint-disable-next-line no-case-declarations
+          case 'csv':
+            try {
+              switch (spec) {
+                case 'wows':
+                  const wows = ToCSV({ data: object.report.wows });
+                  blobs.wows = new Blob([wows], { type: 'text/csv;charset=utf-8' });
+                  FileSaver.saveAs(blobs.wows, `${this.user.displayName} ${reportObj.week_of}: WOWs.csv`);
+                  break;
+                case 'objectives':
+                  const objectives = ToCSV({ data: object.report.objectives });
+                  blob.objectives = new Blob([objectives], { type: 'text/csv;charset=utf-8' });
+                  FileSaver.saveAs(blobs.objectives, `${this.user.displayName} ${reportObj.week_of}: Objectives.csv`);
+                  break;
+                case 'opportunities':
+                  const opportunities = ToCSV({ data: object.report.opportunities });
+                  blobs.opportunities = new Blob([opportunities], { type: 'text/csv;charset=utf-8' });
+                  FileSaver.saveAs(blobs.opportunities, `${this.user.displayName} ${reportObj.week_of}: Opportunities.csv`);
+                  break;
+                case 'status-reports':
+                  const statusReports = ToCSV({ data: object.report.statusReports });
+                  blobs.statusReports = new Blob([statusReports], { type: 'text/csv;charset=utf-8' });
+                  FileSaver.saveAs(blobs.statusReports, `${this.user.displayName} ${reportObj.week_of}: Status Reports.csv`);
+                  break;
+                default:
+                  break;
+              }
+            } catch (err) {
+              // Errors are thrown for bad options, or
+              // if the data is empty and no fields are provided.
+              // Be sure to provide fields if it is possible that your data array will be empty.
+              console.error(err);
+            }
             break;
           default:
             break;

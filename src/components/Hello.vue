@@ -185,6 +185,7 @@
           .signInWithEmailAndPassword(this.loginData.email, this.loginData.password)
           .then((response) => {
             self.$root.fbDatabase.collection('users').doc(response.uid).set({
+              admin: false,
               photoURL: response.photoURL,
               email: response.email,
               displayName: response.displayName,
@@ -205,6 +206,7 @@
             }).then((response) => {
               // Update successful.
               self.$root.fbDatabase.collection('users').doc(response.uid).set({
+                admin: false,
                 photoURL: this.registerData.photoURL,
                 email: response.email,
                 displayName: this.registerData.displayName,
