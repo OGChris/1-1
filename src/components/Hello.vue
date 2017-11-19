@@ -247,8 +247,7 @@
         this.$root.fbAuth
           .signInWithEmailAndPassword(this.loginData.email, this.loginData.password)
           .then((response) => {
-            self.$root.fbDatabase.collection('users').doc(response.uid).set({
-              admin: false,
+            self.$root.fbDatabase.collection('users').doc(response.uid).update({
               photoURL: response.photoURL,
               email: response.email,
               displayName: response.displayName,
@@ -331,4 +330,8 @@
     },
   };
 </script>
-<style></style>
+<style>
+	.hello {
+		min-height: 500px;
+	}
+</style>
