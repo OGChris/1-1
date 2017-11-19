@@ -12,7 +12,7 @@
 
 				<b-navbar-nav>
 					<b-nav-item to="Hello">Home</b-nav-item>
-					<b-nav-item :active="$route.path.indexOf('admin')!==-1" v-if="$root.isAdmin" to="admin">Admin</b-nav-item>
+					<b-nav-item :active="$route.path.indexOf('admin')!==-1" v-if="$root.isAdmin" to="admin">Overview</b-nav-item>
 				</b-navbar-nav>
 
 				<!-- Right aligned nav items -->
