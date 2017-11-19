@@ -4,11 +4,17 @@
 			<b-col></b-col>
 		</b-row>
 		<b-row>
-			<b-col>
+			<b-col class="text-left">
 				<b-table v-if="!loading" striped hover responsive :items="objectives" :fields="fields">
+					<template slot="HEAD_completed">
+						<i v-b-tooltip.hover title="Completed" class="fa fa-check-square-o text-success"></i>
+					</template>
 					<template slot="completed" slot-scope="data">
-						<template v-if="completed"><i class="fa fa-check-square-o text-success"></i> <small>{{ completed_at|mFormat('YYYY-[W]ww') }}</small></template>
+						<template v-if="data.value"><i class="fa fa-check-square-o text-success"></i> <small>{{ data.item.completed_at|mFormat('YYYY-[W]ww') }}</small></template>
 						<template v-else><i class="fa fa-close text-secondary"></i></template>
+					</template>
+					<template slot="user" slot-scope="data">
+						<div v-html="getUserFromList(data.value)"></div>
 					</template>
 				</b-table>
 			</b-col>
@@ -20,9 +26,11 @@
   /* eslint-disable no-param-reassign,no-plusplus */
 
   import _ from 'underscore';
+  import AdminFunctions from './admin-functions.mixin';
 
   export default {
     name: 'objectives',
+    mixins: [AdminFunctions],
     data() {
       return {
         loading: true,
@@ -30,9 +38,9 @@
         reports: [],
         fields: [
           { key: 'text', label: 'Objective', sortable: false },
-          { key: 'completed', sortable: false },
           { key: 'week_of', sortable: true },
           { key: 'user', sortable: false },
+          { key: 'completed', sortable: false },
         ],
       };
     },

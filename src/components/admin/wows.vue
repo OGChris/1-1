@@ -4,8 +4,12 @@
 			<b-col></b-col>
 		</b-row>
 		<b-row>
-			<b-col>
-				<b-table v-if="!loading" striped hover responsive :items="wows" :fields="fields"></b-table>
+			<b-col class="text-left">
+				<b-table v-if="!loading" striped hover responsive :items="wows" :fields="fields">
+					<template slot="user" slot-scope="data">
+						<div v-html="getUserFromList(data.value)"></div>
+					</template>
+				</b-table>
 			</b-col>
 		</b-row>
 	</div>
