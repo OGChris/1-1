@@ -142,8 +142,10 @@
 						<!--<label for="reportWeek">Week</label>-->
 						<b-input-group size="lg">
 							<b-input-group-addon><i class="fa fa-calendar"></i></b-input-group-addon>
-							<b-input id="reportWeek" type="week" v-model="weekOf" min="minWeek" max="maxWeek" required
-								v-validate="'required'" name="reportWeek" @input="weekChanged"></b-input>
+							<!--<b-input id="reportWeek" type="week" v-model="weekOf" min="minWeek" max="maxWeek" required
+								v-validate="'required'" name="reportWeek" @input="weekChanged"></b-input>-->
+							<datepicker :format="customFormatter" wrapper-class="form-control" input-class="dp-input" v-model="weekOfObj" :highlighted="highlightedDates" @selected="weekOfSelected"></datepicker>
+
 							<b-input-group-button class="d-none d-md-block">
 								<b-btn type="submit" variant="primary" :disabled="disableButton">
 									{{ currentReport ? 'Continue' : 'Begin'}}
@@ -153,6 +155,10 @@
 								</b-btn>
 							</b-input-group-button>
 						</b-input-group>
+
+						<!--<b-form-group>
+							<datepicker :format="customFormatter" input-class="form-control" v-model="weekOfObj" :highlighted="highlightedDates" @selected="weekOfSelected"></datepicker>
+						</b-form-group>-->
 
 						<b-btn-group class="d-md-none" size="lg">
 							<b-btn type="submit" variant="primary" :disabled="disableButton">
@@ -201,6 +207,12 @@
         minWeek: moment().subtract(1, 'weeks').format('YYYY-[W]ww'),
         maxWeek: moment().add(1, 'weeks').format('YYYY-[W]ww'),
         weekOf: localStorage.SelectedWeek || moment().format('YYYY-[W]ww'),
+        weekOfObj: moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() || moment().day('Monday').toDate(),
+        highlightedDates: {
+          from: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() : moment().day('Monday').toDate(),
+          to: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Friday').toDate() : moment().day('Friday').toDate(),
+        },
+
         loginData: {
           email: null,
           password: null,
@@ -219,6 +231,7 @@
     },
     computed: mapState(['user', 'currentReport']),
     methods: {
+      // AVATAR LOGIN
       loadLoginAvatars() {
         this.$root.fbDatabase.collection('users').get().then((querySnapshot) => {
           console.log(querySnapshot);
@@ -285,6 +298,22 @@
         // const errorCode = error.code;
         // let errorMessage = error.message;
       },
+      // CALENDAR FUNCTIONS
+      customFormatter(date) {
+        // Week of 46 - Nov 13-17, 2017
+        const m = moment(date);
+        return `${m.format('[Week of] ww -')} ${m.startOf('w').format('MMM DD')} - ${m.endOf('w').format('DD')}`;
+      },
+      weekOfSelected(val) {
+        const date = moment(val);
+        localStorage.SelectedWeek = date.format('YYYY-[W]ww');
+        this.weekOf = date.format('YYYY-[W]ww');
+        this.weekChanged(this.weekOf);
+        this.highlightedDates = {
+          from: date.day('Monday').toDate(),
+          to: date.day('Friday').toDate(),
+        };
+      },
       weekChanged(val) {
         this.disableButton = true;
         localStorage.SelectedWeek = val;
@@ -333,5 +362,12 @@
 <style>
 	.hello {
 		min-height: 500px;
+	}
+
+	.dp-input {
+		width: 240px;
+		max-width: 100%;
+		min-width: 100%;
+		border: none;
 	}
 </style>

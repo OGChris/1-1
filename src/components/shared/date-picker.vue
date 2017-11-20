@@ -20,9 +20,14 @@
 
   import $ from 'jquery';
   import moment from 'moment';
+//  import dp from 'tempusdominus-bootstrap-4';
 
+//  window.jQuery = $;
   require('eonasdan-bootstrap-datetimepicker');
-  
+// eslint-disable-next-line import/no-extraneous-dependencies
+//  require('jquery');
+//  require('tempusdominus-bootstrap-4');
+
   /**
    * The array of names of the tooltip messages of the datetime picker.
    *
@@ -240,6 +245,7 @@
         if (!format) {
           switch (this.type) {
             case 'date':
+            case 'week':
               format = this.dateFormat;
               break;
             case 'time':

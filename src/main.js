@@ -17,6 +17,7 @@ import Vuex from 'vuex';
 import vSelect from 'vue-select';
 import VeeValidate from 'vee-validate';
 import BootstrapVue from 'bootstrap-vue';
+import Datepicker from 'vuejs-datepicker';
 // import Firebase from 'firebase';
 import VueFire from 'vuefire';
 import VueFirestore from 'vue-firestore';
@@ -50,10 +51,11 @@ Vue.use(VueAutosize);
 
 Vue.component('v-select', vSelect);
 Vue.component('shared-header', header);
+Vue.component('datepicker', Datepicker);
+// Vue.component('date-picker', datePicker);
 
 Vue.filter('mFormat', (value, format) => moment(value).format(format));
 
-// Vue.component('date-picker', datePicker);
 Vue.config.productionTip = false;
 Vue.mixin({
   methods: {
