@@ -223,6 +223,7 @@
           password: null,
           photoURL: null,
         },
+        defaultAvatar,
         // eslint-disable-next-line max-len
         avatars: { Andrea, Ethan, Ginny, Harpreet, Janneke, Keerththana, Keyan, Kriska, Lee, Nayeon, Ozge, Tom, Ysabel, Jerez: defaultAvatar },
         loginAvatars: [],
@@ -261,7 +262,7 @@
           .signInWithEmailAndPassword(this.loginData.email, this.loginData.password)
           .then((response) => {
             self.$root.fbDatabase.collection('users').doc(response.uid).update({
-              photoURL: response.photoURL,
+              // photoURL: response.photoURL,
               email: response.email,
               displayName: response.displayName,
             });
@@ -274,21 +275,21 @@
         this.loading = true;
         this.$root.fbAuth
           .createUserWithEmailAndPassword(this.registerData.email, this.registerData.password)
-          .then(() => {
-            this.$root.fbAuth.currentUser.updateProfile({
-              displayName: this.registerData.displayName,
-              photoURL: this.registerData.photoURL,
-            }).then((response) => {
+          .then((user) => {
+            self.$root.fbAuth.currentUser.updateProfile({
+              displayName: self.registerData.displayName,
+              photoURL: self.registerData.photoURL,
+            }).then(() => {
               // Update successful.
-              self.$root.fbDatabase.collection('users').doc(response.uid).set({
+              self.$root.fbDatabase.collection('users').doc(user.uid).set({
                 admin: false,
-                photoURL: this.registerData.photoURL,
-                email: response.email,
-                displayName: this.registerData.displayName,
+                photoURL: self.registerData.photoURL,
+                email: user.email,
+                displayName: self.registerData.displayName,
               });
-              this.$store.commit('setUser', response);
-              this.loading = false;
-            }).catch(this.authErrorHandler);
+              self.$store.commit('setUser', self.$root.fbAuth.currentUser);
+              self.loading = false;
+            }).catch(self.authErrorHandler);
           })
           .catch(this.authErrorHandler);
       },
