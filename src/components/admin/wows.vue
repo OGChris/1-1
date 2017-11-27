@@ -1,14 +1,26 @@
 <template>
 	<div>
 		<b-row>
-			<b-col></b-col>
+			<b-col class="mt-2">
+				<b-form-group horizontal label="Filter" :label-cols="2">
+					<b-input-group>
+						<b-input v-model="filters.search" placeholder="Type to Search" />
+						<!--<b-select v-model="filters.status" :options="statusOptions"></b-select>-->
+						<b-select v-model="filters.user" :options="usersList" value-field="id" text-field="displayName"></b-select>
+						<b-input-group-button>
+							<b-btn @click="resetFilters">Clear</b-btn>
+						</b-input-group-button>
+					</b-input-group>
+				</b-form-group>
+			</b-col>
 		</b-row>
 		<b-row>
 			<b-col class="text-left">
-				<b-table v-if="!loading" striped hover responsive :items="wows" :fields="fields">
+				<b-table v-if="!loading" striped hover responsive="sm" :items="wows" :fields="fields" :filter="filter">
 					<template slot="user" slot-scope="data">
 						<div v-html="getUserFromList(data.value)"></div>
 					</template>
+					<template slot="week_of" slot-scope="data">{{data.value|mWeekToRange}}</template>
 				</b-table>
 			</b-col>
 		</b-row>
@@ -30,10 +42,11 @@
         reports: [],
         fields: [
           { key: 'text', sortable: false },
-          { key: 'media', sortable: false },
+          // { key: 'media', sortable: false },
           { key: 'week_of', sortable: true },
           { key: 'user', sortable: false },
         ],
+        whoOptions: [{ value: null, text: 'Filter by Who' }, 'JR', 'KP', 'OT', 'GD', 'AK', 'NL', 'YE', 'EW', 'KF', 'TL', 'LS', 'HV', 'KR'],
       };
     },
     methods: {
@@ -41,7 +54,7 @@
         let reportIDs = [];
         this.$root.fbDatabase.collection('wows')
           .where('text', '>', '') // filter out empty wows
-          .limit(25)
+          // .limit(25)
           .get()
           .then((querySnapshot) => {
             if (!querySnapshot.empty) {

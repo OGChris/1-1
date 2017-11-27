@@ -9,16 +9,26 @@
 		<b-modal id="historyModal" title="View History" size="lg" ok-only ok-title="Close">
 			<template v-if="activeHistory.length">
 				<h4 v-text="`${activeHistory[0].item} Timeline`"></h4>
-				<b-table responsive small head-variant="dark" striped hover :items="activeHistory"
+				<b-table responsive="sm" small head-variant="dark" striped hover :items="activeHistory"
 				         :fields="['stage', 'status', 'next_steps', 'who', 'date', 'week_of']">
-					<template slot="stage" scope="data">
+					<template slot="stage" slot-scope="data">
 						{{ getStageObject(data.value).name }}
 					</template>
-					<template slot="next_steps" scope="data">
-						<ol class="text-left">
-							<li v-for="(step, index) in data.value" v-text="step.text"></li>
-						</ol>
+					<template slot="next_steps" slot-scope="data">
+						<b-table small striped outlined show-empty head-variant="dark" :items="data.value" :fields="stepsFields">
+							<template slot="text" slot-scope="data">
+								<div class="text-left">{{ data.value }}</div>
+							</template>
+							<template slot="who" slot-scope="data">
+								<b-badge class="mr-1" variant="primary" v-for="item in data.value" v-text="item"></b-badge>
+							</template>
+							<template slot="due_date" slot-scope="data">
+								<template v-if="data.value">{{ data.value | mFormat('ll') }}</template>
+							</template>
+						</b-table>
 					</template>
+					<template slot="date" slot-scope="data">{{data.value|mFormat('ll')}}</template>
+					<template slot="week_of" slot-scope="data">{{data.value|mWeekToRange}}</template>
 				</b-table>
 			</template>
 
@@ -41,6 +51,11 @@
       return {
         transitionName: 'slide-left',
         activeHistory: [],
+        stepsFields: [
+          { key: 'text', sortable: false },
+          { key: 'who', sortable: false },
+          { key: 'due_date', sortable: true },
+        ],
         stageOptions: [
           { name: 'Initiate', code: 'I', value: '1' },
           { name: 'Define', code: 'D1', value: '2' },

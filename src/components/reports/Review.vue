@@ -41,15 +41,23 @@
 								class="fa fa-edit"></i> Edit
 						</b-btn>
 					</h4>
-					<b-table responsive v-if="status_reports.length" head-variant="dark" striped hover :items="status_reports"
+					<b-table responsive="sm" v-if="status_reports.length" head-variant="dark" striped hover :items="status_reports"
 					         :fields="['item', 'stage', 'status', 'next_steps', 'who', 'date']">
 						<template slot="stage" slot-scope="data">
 							{{ getStageObject(data.value).name }}
 						</template>
 						<template slot="next_steps" slot-scope="data">
-							<ol>
-								<li v-for="(step, index) in data.value" v-text="step.text"></li>
-							</ol>
+							<b-table small striped outlined show-empty head-variant="dark" :items="data.value" :fields="stepsFields">
+								<template slot="text" slot-scope="data">
+									<div class="text-left">{{ data.value }}</div>
+								</template>
+								<template slot="who" slot-scope="data">
+									<b-badge class="mr-1" variant="primary" v-for="item in data.value" v-text="item"></b-badge>
+								</template>
+								<template slot="due_date" slot-scope="data">
+									<template v-if="data.value">{{ data.value | mFormat('ll') }}</template>
+								</template>
+							</b-table>
 						</template>
 						<template slot="date" slot-scope="data">
 							<template v-if="data.value">{{ data.value | mFormat('MMM DD') }}</template>
@@ -108,6 +116,11 @@
           { name: 'Develop', code: 'D3', value: '4' },
           { name: 'Deliver', code: 'D4', value: '5' },
           { name: 'Close', code: 'C', value: '6' },
+        ],
+        stepsFields: [
+          { key: 'text', sortable: false },
+          { key: 'who', sortable: false },
+          { key: 'due_date', sortable: true },
         ],
         moment,
       };

@@ -1,14 +1,26 @@
 <template>
 	<div>
 		<b-row>
-			<b-col></b-col>
+			<b-col class="mt-2">
+				<b-form-group horizontal label="Filter" :label-cols="2">
+					<b-input-group>
+						<b-input v-model="filters.search" placeholder="Type to Search" />
+						<!--<b-select v-model="filters.status" :options="statusOptions"></b-select>-->
+						<b-select v-model="filters.user" :options="usersList" value-field="id" text-field="displayName"></b-select>
+						<b-input-group-button>
+							<b-btn @click="resetFilters">Clear</b-btn>
+						</b-input-group-button>
+					</b-input-group>
+				</b-form-group>
+			</b-col>
 		</b-row>
 		<b-row>
 			<b-col class="text-left">
-				<b-table v-if="!loading" striped hover responsive :items="opportunities" :fields="fields">
+				<b-table v-if="!loading" striped hover responsive="sm" :items="opportunities" :fields="fields" :filter="filter">
 					<template slot="HEAD_completed">
 						<i v-b-tooltip.hover title="Completed" class="fa fa-check-square-o text-success"></i>
 					</template>
+					<template slot="week_of" slot-scope="data">{{data.value|mWeekToRange}}</template>
 					<template slot="completed" slot-scope="data">
 						<template v-if="completed"><i class="fa fa-check-square-o text-success"></i> <small>{{ completed_at|mFormat('YYYY-[W]ww') }}</small></template>
 						<template v-else><i class="fa fa-close text-secondary"></i></template>
@@ -48,7 +60,7 @@
         let reportIDs = [];
         this.$root.fbDatabase.collection('opportunities')
           .where('text', '>', '') // filter out empty opportunities
-          .limit(25)
+          // .limit(25)
           .get()
           .then((querySnapshot) => {
             if (!querySnapshot.empty) {

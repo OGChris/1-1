@@ -70,8 +70,10 @@
 												</b-col>
 												<b-col>
 													<b-form-group horizontal label="Due Date">
-														<b-input type="date" v-model="step.due_date" @input="debouncedUpdate(sp)" :data-vv-scope="`rep${index}`"
-														         v-validate="'required|min:1'" :data-vv-name="`date${index}`" :state="errors.has(`date${index}`, `rep${index}`)?'invalid':''"></b-input>
+														<datepicker wrapper-class="form-control" input-class="dp-input" v-model="step.due_date" @input="debouncedUpdate(sp)" :data-vv-scope="`rep${index}`"
+														            v-validate="'required|min:1'" :data-vv-name="`date${index}`" :state="errors.has(`date${index}`, `rep${index}`)?'invalid':''"></datepicker>
+														<!--<b-input type="date" v-model="step.due_date" @input="debouncedUpdate(sp)" :data-vv-scope="`rep${index}`"
+														         v-validate="'required|min:1'" :data-vv-name="`date${index}`" :state="errors.has(`date${index}`, `rep${index}`)?'invalid':''"></b-input>-->
 													</b-form-group>
 												</b-col>
 											</b-row>
@@ -89,8 +91,10 @@
 										<b-col>
 											<b-form-group>
 												<label :for="`sp-due-${index}`">Due Date</label>
-												<b-input :id="`sp-due-${index}`" type="date" v-model="sp.date" @input="debouncedUpdate(sp)" :data-vv-scope="`rep${index}`"
-												         v-validate="'required|min:1'" :data-vv-name="`date${index}`" :state="errors.has(`date${index}`, `rep${index}`)?'invalid':''"></b-input>
+												<datepicker :id="`sp-due-${index}`" wrapper-class="form-control" input-class="dp-input" v-model="sp.date" @input="debouncedUpdate(sp)" :data-vv-scope="`rep${index}`"
+												            v-validate="'required|min:1'" :data-vv-name="`date${index}`" :state="errors.has(`date${index}`, `rep${index}`)?'invalid':''"></datepicker>
+												<!--<b-input :id="`sp-due-${index}`" type="date" v-model="sp.date" @input="debouncedUpdate(sp)" :data-vv-scope="`rep${index}`"
+												         v-validate="'required|min:1'" :data-vv-name="`date${index}`" :state="errors.has(`date${index}`, `rep${index}`)?'invalid':''"></b-input>-->
 											</b-form-group>
 										</b-col>
 									</b-row>
@@ -114,7 +118,14 @@
 		</main>
 	</div>
 </template>
-<style></style>
+<style>
+	.dp-input {
+		width: 240px;
+		max-width: 100%;
+		min-width: 100%;
+		border: none;
+	}
+</style>
 <script type="text/javascript">
   import moment from 'moment';
   import _ from 'underscore';
@@ -193,7 +204,7 @@
         const spCollection = this.$root.fbDatabase.collection('status_reports');
         delete item.id;
         // We will keep track of status reports by saving the current status report to
-        // a subcollection called history. This way, the parent doc can be the current version
+        // a sub-collection called history. This way, the parent doc can be the current version
         // These will be updated weekly as changes are made. i.e. a new history doc
         // will be created every week holding accumulated changes for that week.
         //
@@ -277,9 +288,36 @@
           });
       },
       deleteStatusReport(sp) {
-        this.$root.fbDatabase.collection('status_reports').doc(sp.id).delete().then(() => {
-          this.status_reports = _.reject(this.status_reports, statRep => statRep.id === sp.id);
+        const promises = [];
+        const docsIds = [];
+        let wait = false;
+        // check if it has a history sub-collection first
+        this.$root.fbDatabase.collection('status_reports').doc(sp.id).collection('history').get()
+          .then((querySnapshot) => {
+            if (!querySnapshot.empty) {
+              querySnapshot.forEach((doc) => {
+                wait = true;
+                docsIds.push(doc.id);
+              });
+            }
+          });
+
+        docsIds.forEach((id) => {
+          promises.push(this.$root.fbDatabase.collection('status_reports').doc(sp.id).collection('history').doc(id)
+            .delete());
         });
+        // Then delete the document
+        if (wait) {
+          Promise.all(promises).then(() => {
+            this.$root.fbDatabase.collection('status_reports').doc(sp.id).delete().then(() => {
+              this.status_reports = _.reject(this.status_reports, statRep => statRep.id === sp.id);
+            });
+          });
+        } else {
+          this.$root.fbDatabase.collection('status_reports').doc(sp.id).delete().then(() => {
+            this.status_reports = _.reject(this.status_reports, statRep => statRep.id === sp.id);
+          });
+        }
       },
     },
     mounted() {

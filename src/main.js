@@ -55,6 +55,11 @@ Vue.component('datepicker', Datepicker);
 // Vue.component('date-picker', datePicker);
 
 Vue.filter('mFormat', (value, format) => moment(value).format(format));
+Vue.filter('mWeekToRange', (value) => {
+  if (!value) return '';
+  const m = moment(value, 'YYYY-[W]ww');
+  return `${m.startOf('w').format('MMM DD')} - ${m.endOf('w').format('DD')}`;
+});
 
 Vue.config.productionTip = false;
 Vue.mixin({

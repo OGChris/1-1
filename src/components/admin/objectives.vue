@@ -1,14 +1,26 @@
 <template>
 	<div>
 		<b-row>
-			<b-col></b-col>
+			<b-col class="mt-2">
+				<b-form-group horizontal label="Filter" :label-cols="2">
+					<b-input-group>
+						<b-input v-model="filters.search" placeholder="Type to Search" />
+						<!--<b-select v-model="filters.status" :options="statusOptions"></b-select>-->
+						<b-select v-model="filters.user" :options="usersList" value-field="id" text-field="displayName"></b-select>
+						<b-input-group-button>
+							<b-btn @click="resetFilters">Clear</b-btn>
+						</b-input-group-button>
+					</b-input-group>
+				</b-form-group>
+			</b-col>
 		</b-row>
 		<b-row>
 			<b-col class="text-left">
-				<b-table v-if="!loading" striped hover responsive :items="objectives" :fields="fields">
+				<b-table v-if="!loading" striped hover responsive="sm" :items="objectives" :fields="fields" :filter="filter">
 					<template slot="HEAD_completed">
 						<i v-b-tooltip.hover title="Completed" class="fa fa-check-square-o text-success"></i>
 					</template>
+					<template slot="week_of" slot-scope="data">{{data.value|mWeekToRange}}</template>
 					<template slot="completed" slot-scope="data">
 						<template v-if="data.value"><i class="fa fa-check-square-o text-success"></i> <small>{{ data.item.completed_at|mFormat('YYYY-[W]ww') }}</small></template>
 						<template v-else><i class="fa fa-close text-secondary"></i></template>
@@ -37,6 +49,7 @@
         objectives: [],
         reports: [],
         fields: [
+          // { key: 'id', sortable: false },
           { key: 'text', label: 'Objective', sortable: false },
           { key: 'week_of', sortable: true },
           { key: 'user', sortable: false },
@@ -48,8 +61,8 @@
       loadData() {
         let reportIDs = [];
         this.$root.fbDatabase.collection('objectives')
-          .where('text', '>', '') // filter out empty objectives
-          .limit(25)
+          // .where('text', '>', '') // filter out empty objectives
+          // .limit(25)
           .get()
           .then((querySnapshot) => {
             if (!querySnapshot.empty) {
@@ -76,11 +89,19 @@
               }
               Promise.all(promises).then(() => {
                 // Loop through objectives adding report data
+                const batch = this.$root.fbDatabase.batch();
+                let batchCount = 0;
                 for (let i = 0; i < this.objectives.length; i++) {
                   const report = _.findWhere(this.reports, { id: this.objectives[i].report });
                   this.objectives[i].user = report.uid;
-                  this.objectives[i].week_of = report.week_of;
+                  if (!this.objectives[i].week_of && this.objectives[i].id) {
+                    batchCount++;
+                    this.objectives[i].week_of = report.week_of;
+                    const thisRef = this.$root.fbDatabase.collection('objectives').doc(this.objectives[i].id);
+                    batch.set(thisRef, { week_of: report.week_of }, { merge: true });
+                  }
                 }
+                if (batchCount) batch.commit();
 
                 // Reports Loaded
                 this.loading = false;

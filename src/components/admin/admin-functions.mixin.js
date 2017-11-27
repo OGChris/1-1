@@ -6,11 +6,61 @@ const defaultAvatar = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAM
 export default {
   data() {
     return {
-      usersList: [],
+      usersList: [{ value: null, displayName: 'Filter by User' }],
+      filters: {
+        search: null,
+        status: null,
+        completed: null,
+        user: undefined,
+        who: null,
+      },
     };
     // this.hello();
   },
   methods: {
+    resetFilters() {
+      this.filters = {
+        search: null,
+        status: null,
+        completed: null,
+        user: undefined,
+        who: null,
+      };
+    },
+    filter(data) {
+      let test = true;
+      if (this.filters.who) {
+        if (data.who === this.filters.who) {
+          test = true;
+        } else return false;
+      }
+      if (this.filters.user) {
+        if (data.user === this.filters.user) {
+          test = true;
+        } else return false;
+      }
+      if (this.filters.status) {
+        if (data.status === this.filters.status) {
+          test = true;
+        } else return false;
+      }
+      if (this.filters.search) {
+        test = _.some(data, this.recursiveObjectFilterSearch);
+      }
+      return test;
+    },
+    recursiveObjectFilterSearch(item) {
+      // eslint-disable-next-line no-nested-ternary
+      return _.isObject(item) || _.isArray(item) // check if item is an array or object
+        // if so, search values recursively
+        ? _.some(item, this.recursiveObjectFilterSearch)
+        // check if item is a string
+        : _.isString(item)
+          // if so, normalize values and search
+          ? item.toLowerCase().includes(this.filters.search.toLowerCase())
+          // if not, compare directly
+          : item === this.filters.search;
+    },
     getReportData(id) {
       return this.$root.fbDatabase.collection('reports').doc(id).get().then(doc => doc.exists ? doc : false);
     },

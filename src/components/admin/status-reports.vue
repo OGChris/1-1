@@ -8,7 +8,7 @@
 						<b-select v-model="filters.status" :options="statusOptions"></b-select>
 						<b-select v-model="filters.who" :options="whoOptions"></b-select>
 						<b-input-group-button>
-							<b-btn @click="filters = {search: null, status: null, who: null}">Clear</b-btn>
+							<b-btn @click="resetFilters">Clear</b-btn>
 						</b-input-group-button>
 					</b-input-group>
 				</b-form-group>
@@ -16,11 +16,12 @@
 		</b-row>
 		<b-row>
 			<b-col>
-				<b-table v-if="status_reports.length" responsive head-variant="dark" bordered hover :items="status_reports"
+				<b-table v-if="status_reports.length" responsive="sm" head-variant="dark" bordered hover :items="status_reports"
 				         :fields="['item', 'stage', 'status', 'next_steps', 'who', 'date']" :busy.sync="isBusy" :filter="filter" show-empty >
 					<template slot="stage" slot-scope="data">
 						{{ getStageObject(data.value).name }}
 					</template>
+					<template slot="week_of" slot-scope="data">{{data.value|mWeekToRange}}</template>
 					<template slot="next_steps" slot-scope="data">
 						<b-table small striped outlined show-empty head-variant="dark" :items="data.value" :fields="stepsFields">
 							<template slot="text" slot-scope="data">
@@ -61,11 +62,6 @@
         status_reports: [],
         reports: [],
         isBusy: false,
-        filters: {
-          search: null,
-          status: null,
-          who: null,
-        },
         fields: [
           { key: 'text', sortable: false },
           { key: 'media', sortable: false },
@@ -90,29 +86,6 @@
       };
     },
     methods: {
-      filter(data) {
-        let test = true;
-        if (this.filters.who) {
-          if (data.who === this.filters.who) {
-            test = true;
-          } else return false;
-        }
-        if (this.filters.status) {
-          if (data.status === this.filters.status) {
-            test = true;
-          } else return false;
-        }
-        if (this.filters.search) {
-          test = _.some(data, this.recursiveObjectFilterSearch);
-        }
-        return test;
-      },
-      recursiveObjectFilterSearch(item) {
-        // eslint-disable-next-line no-nested-ternary
-        return _.isObject(item) || _.isArray(item)
-          ? _.some(item, this.recursiveObjectFilterSearch)
-          : item ? item.toLowerCase().includes(this.filters.search.toLowerCase()) : false;
-      },
       getStageObject(val) {
         return val ? _.findWhere(this.stageOptions, { value: val }) : '';
       },
@@ -120,7 +93,7 @@
         let reportIDs = [];
         this.$root.fbDatabase.collection('status_reports')
           .where('item', '>', '') // filter out empty status_reports
-          .limit(25)
+          // .limit(25)
           .get()
           .then((querySnapshot) => {
             if (!querySnapshot.empty) {

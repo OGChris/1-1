@@ -9,13 +9,14 @@
 						         :data-vv-name="`objective${index}`"
 						         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
 						<b-input-group-button>
-							<b-button :pressed.sync="objective.completed" @change="updateCompletedTimestamp(index)" :variant="objective.completed ? 'success' : 'secondary'">
+							<b-button :pressed.sync="objective.completed" @click="updateCompletedTimestamp(objective)" :variant="objective.completed ? 'success' : 'secondary'">
 								<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
 								<i class="fa" :class="[objective.completed ? 'fa-check-square-o' : 'fa-square-o']"></i>
 							</b-button>
 						</b-input-group-button>
 					</b-input-group>
 			</b-form-group>
+			<b-btn block variant="outline-primary" @click.prevent="addObjective"><i class="fa fa-plus"></i> Add an Objective</b-btn>
 
 			<hr>
 			<h4>Previous Objectives</h4>
@@ -27,13 +28,31 @@
 					         :data-vv-name="`objective${index}`"
 					         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
 					<b-input-group-button>
-						<b-button :pressed.sync="objective.completed" @change="updateCompletedTimestamp(index)" :variant="objective.completed ? 'success' : 'secondary'">
+						<b-button :pressed.sync="objective.completed" @click="updateCompletedTimestamp(objective)" :variant="objective.completed ? 'success' : 'secondary'">
 							<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
 							<i class="fa" :class="[objective.completed ? 'fa-check-square-o' : 'fa-square-o']"></i>
 						</b-button>
 					</b-input-group-button>
 				</b-input-group>
-				<small class="form-text text-muted text-left" v-text="getReport(objective.report).week_of"></small>
+				<small class="form-text text-muted text-left">{{getReport(objective.report).week_of|mWeekToRange}}</small>
+			</b-form-group>
+			<hr>
+			<h4>Future Objectives</h4>
+			<h6 class="card-subtitle mb-2 text-muted">I’m will focus on...</h6>
+			<b-form-group v-for="(objective, index) in futureObjectives" :key="objective.id || index">
+				<b-input-group>
+					<b-input type="text" v-model="objective.text" @input="debouncedUpdate(objective)"
+					         :placeholder="`Objective ${index+1}`" v-validate.initial="'max:50'"
+					         :data-vv-name="`objective${index}`"
+					         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
+					<b-input-group-button>
+						<b-button :pressed.sync="objective.completed" @click="updateCompletedTimestamp(objective)" :variant="objective.completed ? 'success' : 'secondary'">
+							<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
+							<i class="fa" :class="[objective.completed ? 'fa-check-square-o' : 'fa-square-o']"></i>
+						</b-button>
+					</b-input-group-button>
+				</b-input-group>
+				<small class="form-text text-muted text-left">{{getReport(objective.report).week_of|mWeekToRange}}</small>
 			</b-form-group>
 
 			<div slot="footer">
@@ -54,7 +73,8 @@
 
 <script type="text/javascript">
   import _ from 'underscore';
-  import { mapState } from 'vuex';
+  import moment from 'moment';
+  // import { mapState } from 'vuex';
   
   export default {
     name: 'Objectives',
@@ -63,9 +83,23 @@
         objectives: [],
         reports: [],
         previousObjectives: [],
+        futureObjectives: [],
       };
     },
-    computed: mapState(['user', 'currentReport']),
+    computed: {
+      user() {
+        return this.$store.state.user;
+      },
+      currentReport() {
+        return this.$store.state.currentReport;
+      },
+      orderedPreviousObjectives() {
+        return [];
+      },
+      orderedFutureObjectives() {
+        return [];
+      },
+    },
     watch: {
       currentReport(val) {
         if (val.id) this.loadCurrentData();
@@ -75,8 +109,8 @@
       },
     },
     methods: {
-      getReport(report) {
-        return _.findWhere(this.reports, { id: report });
+      getReport(id) {
+        return _.findWhere(this.reports, { id });
       },
       addObjective() {
         const obj = {
@@ -86,6 +120,7 @@
           text: '',
           completed: false,
           completed_at: null,
+          week_of: this.currentReport.data().week_of,
         };
         this.$root.fbDatabase.collection('objectives').add(obj)
           .then((docRef) => { this.objectives.push(_.extend({ id: docRef.id }, obj)); })
@@ -93,8 +128,7 @@
             console.error('Error adding document: ', error);
           });
       },
-      updateCompletedTimestamp(index) {
-        const objective = this.objectives[index];
+      updateCompletedTimestamp(objective) {
         // eslint-disable-next-line no-param-reassign
         objective.completed_at = objective.completed ? this.getServerTimestamp() : null;
         // update objective
@@ -135,31 +169,34 @@
             if (querySnapshot.empty) {
               this.addObjective();
               this.addObjective();
-              this.addObjective();
-              this.addObjective();
-              this.addObjective();
             } else {
               querySnapshot.forEach((doc) => {
-                this.objectives.push(_.extend({ id: doc.id }, doc.data()));
+                const item = doc.data();
+                this.objectives.push(_.extend({ id: doc.id }, item));
               });
             }
-            this.loadPreviousData();
+            this.loadOtherData();
           })
           .catch((error) => {
             console.log('Synchronization failed: ', error);
           });
       },
-      loadPreviousData() {
+      loadOtherData() {
         this.$root.fbDatabase.collection('objectives')
           // .where('report', '<>', this.currentReport.id) // notEqual not available
           .where('uid', '==', this.user.uid)
           .where('completed', '==', false)
+          .orderBy('week_of')
           .get()
           .then((querySnapshot) => {
             if (!querySnapshot.empty) {
               querySnapshot.forEach((doc) => {
                 if (this.currentReport.id !== doc.data().report) {
-                  this.previousObjectives.push(_.extend({ id: doc.id }, doc.data()));
+                  if (moment(doc.data().week_of, 'YYYY-[W]ww').isBefore(moment(this.currentReport.data().week_of, 'YYYY-[W]ww'), 'week')) {
+                    this.previousObjectives.push(_.extend({ id: doc.id }, doc.data()));
+                  } else {
+                    this.futureObjectives.push(_.extend({ id: doc.id }, doc.data()));
+                  }
                 }
               });
             }
