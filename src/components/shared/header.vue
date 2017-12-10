@@ -25,14 +25,14 @@
 						<template v-else>Anonymous</template>
 					</b-nav-item>
 
-					<b-nav-item-dropdown right v-b-tooltip.hover.bottom title="Settings" no-caret>
+					<b-nav-item-dropdown v-if="!overideBackground" right v-b-tooltip.hover.bottom title="Settings" no-caret>
 						<!-- Using button-content slot -->
 						<template slot="button-content">
 							<i class="fa fa-cog fa-2x"></i>
 						</template>
 						<!--<b-dropdown-item disabled>Profile</b-dropdown-item>-->
 						<b-dropdown-header>Change Background</b-dropdown-header>
-						<b-dropdown-item :class="{ 'active': activeBackground === 'bg1' }" @click="changeBackground('bg1')">Background 1</b-dropdown-item>
+						<b-dropdown-item  :class="{ 'active': activeBackground === 'bg1' }" @click="changeBackground('bg1')">Background 1</b-dropdown-item>
 						<b-dropdown-item :class="{ 'active': activeBackground === 'bg2' }" @click="changeBackground('bg2')">Background 2</b-dropdown-item>
 						<b-dropdown-item :class="{ 'active': activeBackground === 'bg3' }" @click="changeBackground('bg3')">Background 3</b-dropdown-item>
 						<b-dropdown-item :class="{ 'active': activeBackground === 'bg4' }" @click="changeBackground('bg4')">Background 4</b-dropdown-item>
@@ -63,6 +63,7 @@
       return {
         avatar: defaultAvatar,
         activeBackground: localStorage.SelectedBackground || 'bg1',
+        overideBackground: localStorage.OverideBackground || false,
       };
     },
     computed: mapState(['user']),
