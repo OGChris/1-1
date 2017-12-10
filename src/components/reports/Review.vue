@@ -20,7 +20,8 @@
 					</h4>
 					<ol v-if="objectives.length">
 						<li v-for="(obj, index) in objectives">{{obj.text}}
-							<!-- <span class="float-right">{{obj.completed?'Completed': 'Not Completed'}}</span>--></li>
+							 <b-badge :variant="obj.completed?'success':''">{{obj.completed?'Completed': 'Not Completed'}}</b-badge>
+						</li>
 					</ol>
 					<p v-else>None Set</p>
 					<hr>

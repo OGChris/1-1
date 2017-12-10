@@ -56,9 +56,12 @@ Vue.component('datepicker', Datepicker);
 
 Vue.filter('mFormat', (value, format) => moment(value).format(format));
 Vue.filter('mWeekToRange', (value) => {
-  if (!value) return '';
+  if (!value || value === 'Invalid date') return '';
   const m = moment(value, 'YYYY-[W]ww');
-  return `${m.startOf('w').format('MMM DD')} - ${m.endOf('w').format('DD')}`;
+  const start = m.startOf('w').format('MMM DD');
+  // if end falls on a different month than start we must include the month name
+  const end = moment(m.startOf('w')).isSame(m.endOf('w'), 'month') ? m.endOf('w').format('DD') : m.endOf('w').format('MMM DD');
+  return `${start} - ${end}`;
 });
 
 Vue.config.productionTip = false;
@@ -109,7 +112,8 @@ fbAuth.onAuthStateChanged(() => {
       mounted() {
         // this.user = this.fbAuth.currentUser;
         if (localStorage.SelectedBackground) {
-          $('html').css('background-image', `url("${this.$root.backgrounds[localStorage.SelectedBackground || 'bg1']}")`);
+          if (localStorage.OverideBackground) $('html').css('background-image', `url("${localStorage.SelectedBackground || this.$root.backgrounds.bg1}")`);
+          else $('html').css('background-image', `url("${this.$root.backgrounds[localStorage.SelectedBackground || 'bg1']}")`);
         }
       },
     });

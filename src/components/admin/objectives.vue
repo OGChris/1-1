@@ -22,7 +22,7 @@
 					</template>
 					<template slot="week_of" slot-scope="data">{{data.value|mWeekToRange}}</template>
 					<template slot="completed" slot-scope="data">
-						<template v-if="data.value"><i class="fa fa-check-square-o text-success"></i> <small>{{ data.item.completed_at|mFormat('YYYY-[W]ww') }}</small></template>
+						<template v-if="data.value"><i class="fa fa-check-square-o text-success"></i> <small>{{ data.item.completed_at|mFormat('YYYY-[W]ww')|mWeekToRange }}</small></template>
 						<template v-else><i class="fa fa-close text-secondary"></i></template>
 					</template>
 					<template slot="user" slot-scope="data">
@@ -51,9 +51,9 @@
         fields: [
           // { key: 'id', sortable: false },
           { key: 'text', label: 'Objective', sortable: false },
+          { key: 'completed', sortable: false },
           { key: 'week_of', sortable: true },
           { key: 'user', sortable: false },
-          { key: 'completed', sortable: false },
         ],
       };
     },
@@ -61,7 +61,7 @@
       loadData() {
         let reportIDs = [];
         this.$root.fbDatabase.collection('objectives')
-          // .where('text', '>', '') // filter out empty objectives
+          .where('text', '>', '') // filter out empty objectives
           // .limit(25)
           .get()
           .then((querySnapshot) => {

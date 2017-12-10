@@ -39,11 +39,15 @@
 
 <script>
   import _ from 'underscore';
+  import $ from 'jquery';
   import moment from 'moment';
   import Firebase from 'firebase';
 
   import { mapState } from 'vuex';
   import { TimelineMax, TweenMax, Power4 } from 'gsap';
+
+  // import user backgrounds
+  import YsabelBG from './assets/bg/ysabel_bg.jpg';
 
   export default {
     name: 'app',
@@ -72,6 +76,15 @@
         const toDepth = to.path.split('/').length;
         const fromDepth = from.path.split('/').length;
         this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left';
+      },
+      user(val) {
+        const backgrounds = { YsabelBG };
+        if (val && backgrounds) {
+          // const bg = _.find(backgrounds, item => item);
+          // eslint-disable-next-line max-len
+          const bg = _.find(backgrounds, item => item.includes(val.displayName.split(' ')[0].toLowerCase()));
+          if (bg) this.changeBackground(bg);
+        }
       },
     },
     beforeCreate() {
@@ -103,6 +116,14 @@
       });
     },
     methods: {
+      changeBackground(bg) {
+        const html = $('html');
+        html.css('background-image', `url("${bg}")`);
+        localStorage.OverideBackground = true;
+        localStorage.SelectedBackground = bg;
+        this.activeBackground = bg;
+      },
+
       enter(el, done) {
         const tl = new TimelineMax({
           // id: 'Page Enter',
@@ -157,8 +178,8 @@
 	@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400');
 
 	/*
- * Globals
- */
+     * Globals
+     */
 
 	/*
 	 * Base structure
