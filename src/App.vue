@@ -119,6 +119,7 @@
       changeBackground(bg) {
         const html = $('html');
         html.css('background-image', `url("${bg}")`);
+        html.css('background-position', 'center bottom');
         localStorage.OverideBackground = true;
         localStorage.SelectedBackground = bg;
         this.activeBackground = bg;
