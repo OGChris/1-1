@@ -47,7 +47,19 @@
   import { TimelineMax, TweenMax, Power4 } from 'gsap';
 
   // import user backgrounds
-  import YsabelBG from './assets/bg/ysabel_bg.jpg';
+  import AndreaBG from './assets/bg/Andrea_bg image.png';
+  import EthanBG from './assets/bg/Ethan_bg image.png';
+  import GinnyBG from './assets/bg/Ginny_bg image.png';
+  import HarpreetBG from './assets/bg/Harpreet_bg image.png';
+  import JannekeBG from './assets/bg/Janneke_bg image.png';
+  import KeerththanaBG from './assets/bg/Keerththana_bg image.png';
+  import KeyanBG from './assets/bg/Keyan_bg image.png';
+  import KriskaBG from './assets/bg/Kriska_bg image.png';
+  import LeeBG from './assets/bg/Lee_bg image.png';
+  import NayeonBG from './assets/bg/Nayeon_bg image.png';
+  import OzgeBG from './assets/bg/Ozge_bg image.png';
+  import TomBG from './assets/bg/Tom_bg image.png';
+  import YsabelBG from './assets/bg/Ysabel_bg image.png';
 
   export default {
     name: 'app',
@@ -78,11 +90,12 @@
         this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left';
       },
       user(val) {
-        const backgrounds = { YsabelBG };
+        // eslint-disable-next-line max-len
+        const backgrounds = { AndreaBG, EthanBG, GinnyBG, HarpreetBG, JannekeBG, KeerththanaBG, KeyanBG, KriskaBG, LeeBG, NayeonBG, OzgeBG, TomBG, YsabelBG };
         if (val && backgrounds) {
           // const bg = _.find(backgrounds, item => item);
           // eslint-disable-next-line max-len
-          const bg = _.find(backgrounds, item => item.includes(val.displayName.split(' ')[0].toLowerCase()));
+          const bg = _.find(backgrounds, item => item.toLowerCase().includes(val.displayName.split(' ')[0].toLowerCase())) || JannekeBG;
           if (bg) this.changeBackground(bg);
         }
       },
@@ -119,6 +132,7 @@
       changeBackground(bg) {
         const html = $('html');
         html.css('background-image', `url("${bg}")`);
+        html.css('background-color', '#FFFFFF');
         html.css('background-position', 'center bottom');
         localStorage.OverideBackground = true;
         localStorage.SelectedBackground = bg;

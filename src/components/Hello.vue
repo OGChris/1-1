@@ -134,7 +134,7 @@
 
 				</template>
 				<template v-else>
-					<h1 class="text-white">Welcome Back
+					<h1 class="">Welcome Back
 						<template v-if="user.displayName">, {{user.displayName}}!</template>
 					</h1>
 					<br>

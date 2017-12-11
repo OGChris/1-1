@@ -6,7 +6,7 @@
 					<div class="stepwizard-step col" v-for="(child, index) in children">
 						<b-btn :to="child.path || child.name" :variant="$route.name === child.name ? 'primary' : 'dark'" class="btn-circle" v-text="index+1"></b-btn>
 						<p>
-							<b-link :to="child.path || child.name" :class="$route.name === child.name ? 'text-primary' : 'text-white'" v-text="child.name"></b-link>
+							<b-link :to="child.path || child.name" :class="$route.name === child.name ? 'text-primary' : 'text-dark'" v-text="child.name"></b-link>
 						</p>
 
 					</div>
