@@ -7,10 +7,10 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'font-awesome/css/font-awesome.min.css';
 
-import * as bg1 from '@/assets/bg1.jpg';
-import * as bg2 from '@/assets/bg2.jpg';
-import * as bg3 from '@/assets/bg3.jpg';
-import * as bg4 from '@/assets/bg4.jpg';
+// import * as bg1 from '@/assets/bg1.jpg';
+// import * as bg2 from '@/assets/bg2.jpg';
+// import * as bg3 from '@/assets/bg3.jpg';
+// import * as bg4 from '@/assets/bg4.jpg';
 
 import Vue from 'vue';
 import Vuex from 'vuex';
@@ -30,6 +30,7 @@ import header from './components/shared/header';
 // import datePicker from './components/shared/date-picker';
 import router from './router';
 import firebaseConfig from './firebase';
+import JannekeBG from './assets/bg/Janneke_bg image.png';
 
 const Firebase = require('firebase');
 
@@ -106,14 +107,14 @@ fbAuth.onAuthStateChanged(() => {
             notes: [],
             statusReports: [],
           },
-          backgrounds: { bg1, bg2, bg3, bg4 },
+          // backgrounds: { bg1, bg2, bg3, bg4 },
         };
       },
       mounted() {
         // this.user = this.fbAuth.currentUser;
         if (localStorage.SelectedBackground) {
           if (localStorage.OverideBackground) $('html').css('background-image', `url("${localStorage.SelectedBackground || this.$root.backgrounds.bg1}")`);
-          else $('html').css('background-image', `url("${this.$root.backgrounds[localStorage.SelectedBackground || 'bg1']}")`);
+          else $('html').css('background-image', `url("${JannekeBG}")`);
         }
       },
     });

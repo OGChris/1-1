@@ -120,7 +120,8 @@
           text: '',
           completed: false,
           completed_at: null,
-          week_of: this.currentReport.data().week_of,
+          week_of: this.currentReport.data
+            ? this.currentReport.data().week_of : this.currentReport.week_of,
         };
         this.$root.fbDatabase.collection('objectives').add(obj)
           .then((docRef) => { this.objectives.push(_.extend({ id: docRef.id }, obj)); })
@@ -192,7 +193,9 @@
             if (!querySnapshot.empty) {
               querySnapshot.forEach((doc) => {
                 if (this.currentReport.id !== doc.data().report) {
-                  if (moment(doc.data().week_of, 'YYYY-[W]ww').isBefore(moment(this.currentReport.data().week_of, 'YYYY-[W]ww'), 'week')) {
+                  const weekOf = this.currentReport.data
+                    ? this.currentReport.data().week_of : this.currentReport.week_of;
+                  if (moment(doc.data().week_of, 'YYYY-[W]ww').isBefore(moment(weekOf, 'YYYY-[W]ww'), 'week')) {
                     this.previousObjectives.push(_.extend({ id: doc.id }, doc.data()));
                   } else {
                     this.futureObjectives.push(_.extend({ id: doc.id }, doc.data()));

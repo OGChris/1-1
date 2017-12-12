@@ -25,18 +25,18 @@
 						<template v-else>Anonymous</template>
 					</b-nav-item>
 
-					<b-nav-item-dropdown v-if="!overideBackground" right v-b-tooltip.hover.bottom title="Settings" no-caret>
-						<!-- Using button-content slot -->
+					<!--<b-nav-item-dropdown v-if="!overideBackground" right v-b-tooltip.hover.bottom title="Settings" no-caret>
+						&lt;!&ndash; Using button-content slot &ndash;&gt;
 						<template slot="button-content">
 							<i class="fa fa-cog fa-2x"></i>
 						</template>
-						<!--<b-dropdown-item disabled>Profile</b-dropdown-item>-->
+						&lt;!&ndash;<b-dropdown-item disabled>Profile</b-dropdown-item>&ndash;&gt;
 						<b-dropdown-header>Change Background</b-dropdown-header>
 						<b-dropdown-item  :class="{ 'active': activeBackground === 'bg1' }" @click="changeBackground('bg1')">Background 1</b-dropdown-item>
 						<b-dropdown-item :class="{ 'active': activeBackground === 'bg2' }" @click="changeBackground('bg2')">Background 2</b-dropdown-item>
 						<b-dropdown-item :class="{ 'active': activeBackground === 'bg3' }" @click="changeBackground('bg3')">Background 3</b-dropdown-item>
 						<b-dropdown-item :class="{ 'active': activeBackground === 'bg4' }" @click="changeBackground('bg4')">Background 4</b-dropdown-item>
-					</b-nav-item-dropdown>
+					</b-nav-item-dropdown>-->
 
 					<b-nav-item v-if="user" title="Sign Out" @click.stop.prevent="signOut" v-b-tooltip.hover.bottom>
 						<i class="fa fa-sign-out fa-2x"></i>

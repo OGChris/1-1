@@ -5,11 +5,15 @@
 				<b-form-group horizontal label="Filter" :label-cols="2">
 					<b-input-group>
 						<b-input v-model="filters.search" placeholder="Type to Search" />
-						<!--<b-select v-model="filters.status" :options="statusOptions"></b-select>-->
+						<datepicker :format="customFormatter" wrapper-class="form-control" input-class="dp-input" v-model="weekOfObject" :highlighted="highlightedDates" @selected="weekOfSelected"></datepicker>
 						<b-select v-model="filters.user" :options="usersList" value-field="id" text-field="displayName"></b-select>
-						<b-input-group-button>
-							<b-btn @click="resetFilters">Clear</b-btn>
-						</b-input-group-button>
+							<b-input-group-button>
+								<b-btn @click="resetFilters">Clear</b-btn>
+								<b-dropdown variant="info" right text="Export">
+									<b-dropdown-item @click="prepExport('csv')">CSV</b-dropdown-item>
+								</b-dropdown>
+							</b-input-group-button>
+
 					</b-input-group>
 				</b-form-group>
 			</b-col>
@@ -26,7 +30,14 @@
 		</b-row>
 	</div>
 </template>
-<style></style>
+<style>
+	.dp-input {
+		/*width: 240px;*/
+		max-width: 100%;
+		min-width: 100%;
+		border: none;
+	}
+</style>
 <script type="text/javascript">
   /* eslint-disable no-param-reassign,no-plusplus */
   import _ from 'underscore';
@@ -94,6 +105,21 @@
           .catch((error) => {
             console.log('Synchronization failed: ', error);
           });
+      },
+      prepExport(type) {
+        const data = [];
+        switch (type) {
+          case 'csv':
+            _.each(this.wows, (item) => {
+              const wow = _.pick(item, 'text', 'week_of', 'user');
+              wow.user = this.getUserFromList(item.user).split('> ')[1];
+              data.push(wow);
+            });
+            this.exportAs('csv', 'wows', data);
+            break;
+          default:
+            break;
+        }
       },
     },
     mounted() {

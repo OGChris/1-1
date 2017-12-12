@@ -240,7 +240,7 @@
           .get()
           .then((querySnapshot) => {
             if (querySnapshot.empty) {
-              this.addStatusReport();
+              // this.addStatusReport();
             } else {
               querySnapshot.forEach((doc) => {
                 this.status_reports.push(_.extend({ id: doc.id }, doc.data()));
