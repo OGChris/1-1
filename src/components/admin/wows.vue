@@ -111,9 +111,11 @@
         switch (type) {
           case 'csv':
             _.each(this.wows, (item) => {
-              const wow = _.pick(item, 'text', 'week_of', 'user');
-              wow.user = this.getUserFromList(item.user).split('> ')[1];
-              data.push(wow);
+              if (this.filter(item)) {
+                const wow = _.pick(item, 'text', 'week_of', 'user');
+                wow.user = this.getUserFromList(item.user).split('> ')[1];
+                data.push(wow);
+              }
             });
             this.exportAs('csv', 'wows', data);
             break;
