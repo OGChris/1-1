@@ -5,10 +5,14 @@
 				<b-form-group horizontal label="Filter" :label-cols="2">
 					<b-input-group>
 						<b-input v-model="filters.search" placeholder="Type to Search" />
+						<datepicker placeholder="Week Of" :format="customFormatter" wrapper-class="form-control" input-class="dp-input" v-model="weekOfObject" :highlighted="highlightedDates" @selected="weekOfSelected"></datepicker>
 						<b-select v-model="filters.status" :options="statusOptions"></b-select>
 						<b-select v-model="filters.who" :options="whoOptions"></b-select>
 						<b-input-group-button>
 							<b-btn @click="resetFilters">Clear</b-btn>
+							<b-dropdown variant="info" right text="Export">
+								<b-dropdown-item @click="prepExport('csv')">CSV</b-dropdown-item>
+							</b-dropdown>
 						</b-input-group-button>
 					</b-input-group>
 				</b-form-group>
@@ -16,7 +20,7 @@
 		</b-row>
 		<b-row>
 			<b-col>
-				<b-table v-if="status_reports.length" responsive="sm" head-variant="dark" bordered hover :items="status_reports"
+				<b-table v-if="statusReports.length" responsive="sm" head-variant="dark" bordered hover :items="statusReports"
 				         :fields="['item', 'stage', 'status', 'next_steps', 'who', 'date']" :busy.sync="isBusy" :filter="filter" show-empty >
 					<template slot="stage" slot-scope="data">
 						{{ getStageObject(data.value).name }}
@@ -51,6 +55,7 @@
 <script type="text/javascript">
   /* eslint-disable no-param-reassign,no-plusplus */
   import _ from 'underscore';
+  import moment from 'moment';
   import AdminFunctions from './admin-functions.mixin';
 
   export default {
@@ -59,7 +64,7 @@
     data() {
       return {
         loading: true,
-        status_reports: [],
+        statusReports: [],
         reports: [],
         isBusy: false,
         fields: [
@@ -92,18 +97,18 @@
       loadData() {
         let reportIDs = [];
         this.$root.fbDatabase.collection('status_reports')
-          .where('item', '>', '') // filter out empty status_reports
+          .where('item', '>', '') // filter out empty statusReports
           // .limit(25)
           .get()
           .then((querySnapshot) => {
             if (!querySnapshot.empty) {
-              // loop through status_reports
+              // loop through statusReports
               querySnapshot.forEach((doc) => {
                 if (doc.exists) {
-                  const wow = doc.data();
-                  this.status_reports.push(_.extend({ id: doc.id }, wow));
+                  const item = doc.data();
+                  this.statusReports.push(_.extend({ id: doc.id }, item));
                   // collect report ids
-                  reportIDs.push(wow.report);
+                  reportIDs.push(item.report);
                 }
               });
               // purge array of duplicates
@@ -118,11 +123,11 @@
               }
 
               Promise.all(promises).then(() => {
-                // Loop through status_reports adding report data
-                for (let i = 0; i < this.status_reports.length; i++) {
-                  const report = _.findWhere(this.reports, { id: this.status_reports[i].report });
-                  this.status_reports[i].user = report.uid;
-                  this.status_reports[i].week_of = report.week_of;
+                // Loop through statusReports adding report data
+                for (let i = 0; i < this.statusReports.length; i++) {
+                  const report = _.findWhere(this.reports, { id: this.statusReports[i].report });
+                  this.statusReports[i].user = report.uid;
+                  this.statusReports[i].week_of = report.week_of;
                 }
 
                 // Reports Loaded
@@ -133,6 +138,25 @@
           .catch((error) => {
             console.log('Synchronization failed: ', error);
           });
+      },
+      prepExport(type) {
+        const data = [];
+        switch (type) {
+          case 'csv':
+            _.each(this.statusReports, (item) => {
+              if (this.filter(item)) {
+                const statusReport = _.pick(item, 'id', 'item', 'stage', 'status', 'next_steps', 'who', 'date');
+                statusReport.stage = this.getStageObject(item.stage).name;
+                statusReport.week_of = moment(item.week_of, 'YYYY-[W]ww').startOf('w').day('Monday').format('MMM DD, YYYY');
+                statusReport.user = this.getUserFromList(item.user).split('> ')[1];
+                data.push(statusReport);
+              }
+            });
+            this.exportAs('csv', 'status-reports', { data, unwindPath: 'next_steps' });
+            break;
+          default:
+            break;
+        }
       },
     },
     mounted() {

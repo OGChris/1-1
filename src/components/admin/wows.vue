@@ -5,15 +5,14 @@
 				<b-form-group horizontal label="Filter" :label-cols="2">
 					<b-input-group>
 						<b-input v-model="filters.search" placeholder="Type to Search" />
-						<datepicker :format="customFormatter" wrapper-class="form-control" input-class="dp-input" v-model="weekOfObject" :highlighted="highlightedDates" @selected="weekOfSelected"></datepicker>
+						<datepicker placeholder="Week Of" :format="customFormatter" wrapper-class="form-control" input-class="dp-input" v-model="weekOfObject" :highlighted="highlightedDates" @selected="weekOfSelected"></datepicker>
 						<b-select v-model="filters.user" :options="usersList" value-field="id" text-field="displayName"></b-select>
-							<b-input-group-button>
-								<b-btn @click="resetFilters">Clear</b-btn>
-								<b-dropdown variant="info" right text="Export">
-									<b-dropdown-item @click="prepExport('csv')">CSV</b-dropdown-item>
-								</b-dropdown>
-							</b-input-group-button>
-
+						<b-input-group-button>
+							<b-btn @click="resetFilters">Clear</b-btn>
+							<b-dropdown variant="info" right text="Export">
+								<b-dropdown-item @click="prepExport('csv')">CSV</b-dropdown-item>
+							</b-dropdown>
+						</b-input-group-button>
 					</b-input-group>
 				</b-form-group>
 			</b-col>
@@ -31,16 +30,11 @@
 	</div>
 </template>
 <style>
-	.dp-input {
-		/*width: 240px;*/
-		max-width: 100%;
-		min-width: 100%;
-		border: none;
-	}
 </style>
 <script type="text/javascript">
   /* eslint-disable no-param-reassign,no-plusplus */
   import _ from 'underscore';
+  import moment from 'moment';
   import AdminFunctions from './admin-functions.mixin';
 
   export default {
@@ -113,11 +107,12 @@
             _.each(this.wows, (item) => {
               if (this.filter(item)) {
                 const wow = _.pick(item, 'text', 'week_of', 'user');
+                wow.week_of = moment(item.week_of, 'YYYY-[W]ww').startOf('w').day('Monday').format('MMM DD, YYYY');
                 wow.user = this.getUserFromList(item.user).split('> ')[1];
                 data.push(wow);
               }
             });
-            this.exportAs('csv', 'wows', data);
+            this.exportAs('csv', 'wows', { data });
             break;
           default:
             break;

@@ -59,9 +59,9 @@ Vue.filter('mFormat', (value, format) => moment(value).format(format));
 Vue.filter('mWeekToRange', (value) => {
   if (!value || value === 'Invalid date') return '';
   const m = moment(value, 'YYYY-[W]ww');
-  const start = m.startOf('w').format('MMM DD');
+  const start = m.startOf('w').day('Monday').format('MMM DD');
   // if end falls on a different month than start we must include the month name
-  const end = moment(m.startOf('w')).isSame(m.endOf('w'), 'month') ? m.endOf('w').format('DD') : m.endOf('w').format('MMM DD');
+  const end = moment(m.startOf('w').day('Monday')).isSame(m.endOf('w').day('Friday'), 'month') ? m.endOf('w').day('Friday').format('DD') : m.endOf('w').day('Friday').format('MMM DD');
   return `${start} - ${end}`;
 });
 

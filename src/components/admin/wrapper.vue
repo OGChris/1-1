@@ -30,6 +30,15 @@
 			</main>
 		</div>
 </template>
+<style>
+	.vdp-datepicker { padding: 0 0.75rem }
+	.dp-input {
+		width: 100%;
+		max-width: 100%;
+		min-width: 100%;
+		border: none;
+	}
+</style>
 <script type="text/javascript">
   import { TimelineMax, TweenMax, Power4 } from 'gsap';
 

@@ -5,10 +5,14 @@
 				<b-form-group horizontal label="Filter" :label-cols="2">
 					<b-input-group>
 						<b-input v-model="filters.search" placeholder="Type to Search" />
+						<datepicker placeholder="Week Of" :format="customFormatter" wrapper-class="form-control" input-class="dp-input" v-model="weekOfObject" :highlighted="highlightedDates" @selected="weekOfSelected"></datepicker>
 						<!--<b-select v-model="filters.status" :options="statusOptions"></b-select>-->
 						<b-select v-model="filters.user" :options="usersList" value-field="id" text-field="displayName"></b-select>
 						<b-input-group-button>
 							<b-btn @click="resetFilters">Clear</b-btn>
+							<b-dropdown variant="info" right text="Export">
+								<b-dropdown-item @click="prepExport('csv')">CSV</b-dropdown-item>
+							</b-dropdown>
 						</b-input-group-button>
 					</b-input-group>
 				</b-form-group>
@@ -38,6 +42,7 @@
   /* eslint-disable no-param-reassign,no-plusplus */
 
   import _ from 'underscore';
+  import moment from 'moment';
   import AdminFunctions from './admin-functions.mixin';
 
   export default {
@@ -101,6 +106,24 @@
           .catch((error) => {
             console.log('Synchronization failed: ', error);
           });
+      },
+      prepExport(type) {
+        const data = [];
+        switch (type) {
+          case 'csv':
+            _.each(this.opportunities, (item) => {
+              if (this.filter(item)) {
+                const opportunity = _.pick(item, 'text', 'week_of', 'user');
+                opportunity.week_of = moment(item.week_of, 'YYYY-[W]ww').startOf('w').day('Monday').format('MMM DD, YYYY');
+                opportunity.user = this.getUserFromList(item.user).split('> ')[1];
+                data.push(opportunity);
+              }
+            });
+            this.exportAs('csv', 'opportunities', { data });
+            break;
+          default:
+            break;
+        }
       },
     },
     mounted() {

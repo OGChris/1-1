@@ -31,13 +31,15 @@ export default {
   methods: {
     resetFilters() {
       this.weekOfObject = null;
-      this.filters = {
+      this.filters = _.extend(this.filters, {
+        week_of: null,
         search: null,
         status: null,
         completed: null,
         user: undefined,
         who: null,
-      };
+      });
+      this.highlightedDates = _.extend(this.highlightedDates, { from: null, to: null });
     },
     filter(data) {
       let test = true;
@@ -99,7 +101,10 @@ export default {
     customFormatter(date) {
       // Week of 46 - Nov 13-17, 2017
       const m = moment(date);
-      return `${m.startOf('w').format('MMM DD')} - ${m.endOf('w').format('DD')}`;
+      const start = m.startOf('w').day('Monday').format('MMM DD');
+      // if end falls on a different month than start we must include the month name
+      const end = moment(m.startOf('w').day('Monday')).isSame(m.endOf('w').day('Friday'), 'month') ? m.endOf('w').day('Friday').format('DD') : m.endOf('w').day('Friday').format('MMM DD');
+      return `${start} - ${end}`;
     },
     weekOfSelected(val) {
       const date = moment(val);
@@ -111,8 +116,7 @@ export default {
         to: date.day('Friday').toDate(),
       };
     },
-    exportAs(type, spec, data) {
-      let blob;
+    exportAs(type, spec, options) {
       const blobs = {};
       // const reportObj = _.extend({ id: this.currentReport.id }, this.currentReport.data());
       // const weekMoment = moment(reportObj.week_of, 'YYYY-[W]ww');
@@ -123,22 +127,22 @@ export default {
           try {
             switch (spec) {
               case 'wows':
-                const wows = ToCSV({ data });
+                const wows = ToCSV(options);
                 blobs.wows = new Blob([wows], { type: 'text/csv;charset=utf-8' });
                 FileSaver.saveAs(blobs.wows, `WOWs.csv`);
                 break;
               case 'objectives':
-                const objectives = ToCSV({ data });
-                blob.objectives = new Blob([objectives], { type: 'text/csv;charset=utf-8' });
+                const objectives = ToCSV(options);
+                blobs.objectives = new Blob([objectives], { type: 'text/csv;charset=utf-8' });
                 FileSaver.saveAs(blobs.objectives, `Objectives.csv`);
                 break;
               case 'opportunities':
-                const opportunities = ToCSV({ data });
+                const opportunities = ToCSV(options);
                 blobs.opportunities = new Blob([opportunities], { type: 'text/csv;charset=utf-8' });
                 FileSaver.saveAs(blobs.opportunities, `Opportunities.csv`);
                 break;
               case 'status-reports':
-                const statusReports = ToCSV({ data });
+                const statusReports = ToCSV(options);
                 blobs.statusReports = new Blob([statusReports], { type: 'text/csv;charset=utf-8' });
                 FileSaver.saveAs(blobs.statusReports, `Status Reports.csv`);
                 break;
