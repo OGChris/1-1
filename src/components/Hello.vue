@@ -96,6 +96,11 @@
 							<b-form-group id="login-password-group" label-for="login-password">
 								<b-form-input ref="focusThis" v-model="loginData.password" id="login-password" type="password"
 								              placeholder="Enter your password"></b-form-input>
+								<template v-if="loginError">
+									<p v-if="loginError === 'auth/wrong-password'" class="text-danger">
+										The password you entered is incorrect, please try again.
+									</p>
+								</template>
 							</b-form-group>
 						</b-form>
 					</b-modal>
@@ -212,7 +217,7 @@
           from: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() : moment().day('Monday').toDate(),
           to: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Friday').toDate() : moment().day('Friday').toDate(),
         },
-
+        loginError: null,
         loginData: {
           email: null,
           password: null,
@@ -255,7 +260,9 @@
           this.$refs.avatarRegisterModal.show();
         }
       },
-      login() {
+      login(event) {
+        this.loginError = null;
+        event.preventDefault();
         const self = this;
         this.loading = true;
         this.$root.fbAuth
@@ -266,9 +273,12 @@
               email: response.email,
               displayName: response.displayName,
             });
+            this.$refs.avatarLoginModal.hide();
             this.loading = false;
           })
-          .catch(this.authErrorHandler);
+          .catch((response) => {
+            this.loginError = response.code;
+          });
       },
       register() {
         const self = this;
