@@ -145,7 +145,7 @@
           case 'csv':
             _.each(this.statusReports, (item) => {
               if (this.filter(item)) {
-                const statusReport = _.pick(item, 'id', 'item', 'stage', 'status', 'next_steps', 'who', 'date');
+                const statusReport = _.pick(item, 'item', 'stage', 'status', 'next_steps', 'who', 'date');
                 statusReport.stage = this.getStageObject(item.stage).name;
                 statusReport.week_of = moment(item.week_of, 'YYYY-[W]ww').startOf('w').day('Monday').format('MMM DD, YYYY');
                 statusReport.user = this.getUserFromList(item.user).split('> ')[1];
