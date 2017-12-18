@@ -170,6 +170,7 @@
 </template>
 
 <script>
+  import swal from 'sweetalert';
   import _ from 'underscore';
   import { mapState } from 'vuex';
   import moment from 'moment';
@@ -292,15 +293,21 @@
           .catch(this.authErrorHandler);
       },
       requestPasswordReset() {
-        this.$root.fbAuth.sendPasswordResetEmail(this.loginData.email)
-          .then(() => {
-            alert('Password reset email sent. Please check your email.');
-            // Password reset email sent.
-          })
-          .catch((error) => {
-            alert(error);
-            // Error occurred. Inspect error.code.
-          });
+        swal('Forgot Your Password?', 'Would you like to reset it?', 'info', {
+          button: 'Yes',
+        }).then((value) => {
+          if (value) {
+            this.$root.fbAuth.sendPasswordResetEmail(this.loginData.email)
+              .then(() => {
+                swal('Password reset email sent!', 'Please check your email.', 'success');
+                // Password reset email sent.
+              })
+              .catch((error) => {
+                swal('Something went wrong', error, 'error');
+                // Error occurred. Inspect error.code.
+              });
+          }
+        });
       },
       authErrorHandler() {
         // alert(error);

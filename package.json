@@ -24,6 +24,7 @@
     "jquery": "^3.2.1",
     "json2csv": "^3.11.5",
     "moment": "^2.19.2",
+    "sweetalert": "^2.1.0",
     "underscore": "^1.8.3",
     "vee-validate": "^2.0.0-rc.23",
     "vue": "^2.5.7",
