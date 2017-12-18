@@ -4,35 +4,20 @@
 			<div class="hello">
 				<template v-if="!user">
 					<h1 class="text-white">{{ heading }}</h1>
-					<template v-if="showAvatarLogin">
+					<!--<template v-if="showAvatarLogin">-->
 						<b-card title="Select your Avatar">
 							<b-btn variant="outline-primary" class="m-1" v-for="(avatar, key) in avatars" :key="key" @click="loginAvatarSelected(key)">
 								<b-img :src="avatar" rounded="circle" width="50" height="50" blank-color="#777" alt="img" class="m-1" />
 								<br>{{ key }}
 							</b-btn>
-							<!--<b-form id="avatar-login" @submit.prevent="">
-								<b-form-group>
-
-									<b-form-radio-group id="avatars-login" buttons button-variant="outline-primary"
-									                    style="flex-wrap: wrap;justify-content: center;"
-									                    v-model="registerData.photoURL" name="avatars" required>
-										<b-form-radio v-for="(avatar, key) in avatars" :key="key" @change="loginAvatarSelected(key)">
-											<b-img :src="avatar" rounded="circle" width="50" height="50" blank-color="#777" alt="img" class="m-1" />
-											<br>{{ key }}
-										</b-form-radio>
-									</b-form-radio-group>
-								</b-form-group>
-							</b-form>-->
 
 							<!--<div class="text-center">
 								<p class="text-center">If you do not see your avatar</p>
 								<b-btn variant="secondary">Login with email and password</b-btn>
 							</div>-->
-
-
 						</b-card>
-					</template>
-					<template v-else>
+					<!--</template>-->
+					<!--<template v-else>
 						<b-card no-body>
 							<b-tabs small card ref="tabs" class="nav-fill" v-model="tabIndex">
 
@@ -83,7 +68,7 @@
 								</b-tab>
 							</b-tabs>
 						</b-card>
-					</template>
+					</template>-->
 
 					<b-modal ref="avatarLoginModal" title="Authentication" @ok="login">
 						<div v-if="selectedLoginAvatar">
@@ -92,16 +77,19 @@
 							&nbsp;
 							{{selectedLoginAvatar.displayName || selectedLoginAvatar.email}}
 						</div>
+						<br>
 						<b-form id="login" data-vv-scope="login">
 							<b-form-group id="login-password-group" label-for="login-password">
 								<b-form-input ref="focusThis" v-model="loginData.password" id="login-password" type="password"
 								              placeholder="Enter your password"></b-form-input>
 								<template v-if="loginError">
-									<p v-if="loginError === 'auth/wrong-password'" class="text-danger">
+									<p v-if="loginError.code === 'auth/wrong-password'" class="text-danger">
 										The password you entered is incorrect, please try again.
 									</p>
+									<p v-else v-text="loginError.message"></p>
 								</template>
 							</b-form-group>
+							<b-btn variant="outline-secondary" @click.prevent="requestPasswordReset">Forgot your password?</b-btn>
 						</b-form>
 					</b-modal>
 
@@ -277,7 +265,7 @@
             this.loading = false;
           })
           .catch((response) => {
-            this.loginError = response.code;
+            this.loginError = response;
           });
       },
       register() {
@@ -302,6 +290,17 @@
             }).catch(self.authErrorHandler);
           })
           .catch(this.authErrorHandler);
+      },
+      requestPasswordReset() {
+        this.$root.fbAuth.sendPasswordResetEmail(this.loginData.email)
+          .then(() => {
+            alert('Password reset email sent. Please check your email.');
+            // Password reset email sent.
+          })
+          .catch((error) => {
+            alert(error);
+            // Error occurred. Inspect error.code.
+          });
       },
       authErrorHandler() {
         // alert(error);
