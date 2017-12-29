@@ -1,111 +1,97 @@
 <template>
-	<div class="offset-md-2 col-md-8 col-xs-12 align-self-center mt-5 mb-5">
-		<main id="objectives" role="main" class="inner cover">
-		<b-card title="Objectives" sub-title="I’m focused on..." header-text-variant="primary" class="mb-2">
-			<b-form-group v-for="(objective, index) in objectives" :key="objective.id || index">
-				<b-input-group>
-						<b-input type="text" v-model="objective.text" @input="debouncedUpdate(objective)"
-						         :placeholder="`Objective ${index+1}`" v-validate.initial="'max:50'"
-						         :data-vv-name="`objective${index}`"
-						         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
-						<b-input-group-button>
-							<b-button :pressed.sync="objective.completed" @click="updateCompletedTimestamp(objective)" :variant="objective.completed ? 'success' : 'secondary'">
-								<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
-								<i class="fa" :class="[objective.completed ? 'fa-check-square-o' : 'fa-square-o']"></i>
-							</b-button>
-						</b-input-group-button>
-					</b-input-group>
-			</b-form-group>
-			<b-btn block variant="outline-primary" @click.prevent="addObjective"><i class="fa fa-plus"></i> Add an Objective</b-btn>
+	<section class="section inner-wrapper">
+		<b-container>
+			<b-row>
+				<div class="offset-md-4 offset-xs-3 col-md-8 col-xs-9 align-self-center mt-5 mb-5">
+					<b-card class="custom-card dup dup2"></b-card>
+					<b-card class="custom-card dup dup1"></b-card>
+					<b-card title="Priorities" sub-title="Key project I’ll be focused on over the next two weeks, with estimated time required." header-text-variant="primary" class="custom-card main mb-2">
+						<b-form-group v-for="(objective, index) in $root.collection.objectives" :key="objective.id || index">
+							<b-input-group>
+								<b-input type="text" v-model="objective.text"
+								         :placeholder="`Priority ${index+1}`" v-validate.initial="'max:50'"
+								         :data-vv-name="`objective${index}`"
+								         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
+								<b-input-group-button>
+									<b-button @click="removeObj(index)" variant="danger"><i class="fa fa-trash"></i></b-button>
+								</b-input-group-button>
+							</b-input-group>
+							<b-input-group>
+								<b-input type="number" v-model="objective.bandwidth" :placeholder="`Priority ${index+1} Bandwidth`"></b-input>
+								<b-select v-model="objective.bandwidth_unit">
+									<option value="hours">Hours</option>
+									<option value="days">Days</option>
+									<option value="weeks">Weeks</option>
+								</b-select>
+							</b-input-group>
+						</b-form-group>
+						<b-btn block variant="outline-primary" @click.prevent="addObjective"><i class="fa fa-plus"></i> Add a Priority</b-btn>
 
-			<hr>
-			<h4>Previous Objectives</h4>
-			<h6 class="card-subtitle mb-2 text-muted">I’m still focused on...</h6>
-			<b-form-group v-for="(objective, index) in previousObjectives" :key="objective.id || index">
-				<b-input-group>
-					<b-input type="text" v-model="objective.text" @input="debouncedUpdate(objective)"
-					         :placeholder="`Objective ${index+1}`" v-validate.initial="'max:50'"
-					         :data-vv-name="`objective${index}`"
-					         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
-					<b-input-group-button>
-						<b-button :pressed.sync="objective.completed" @click="updateCompletedTimestamp(objective)" :variant="objective.completed ? 'success' : 'secondary'">
-							<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
-							<i class="fa" :class="[objective.completed ? 'fa-check-square-o' : 'fa-square-o']"></i>
-						</b-button>
-					</b-input-group-button>
-				</b-input-group>
-				<small class="form-text text-muted text-left">{{getReport(objective.report).week_of|mWeekToRange}}</small>
-			</b-form-group>
-			<hr>
-			<h4>Future Objectives</h4>
-			<h6 class="card-subtitle mb-2 text-muted">I’m will focus on...</h6>
-			<b-form-group v-for="(objective, index) in futureObjectives" :key="objective.id || index">
-				<b-input-group>
-					<b-input type="text" v-model="objective.text" @input="debouncedUpdate(objective)"
-					         :placeholder="`Objective ${index+1}`" v-validate.initial="'max:50'"
-					         :data-vv-name="`objective${index}`"
-					         :state="errors.has(`objective${index}`)?'invalid':''"></b-input>
-					<b-input-group-button>
-						<b-button :pressed.sync="objective.completed" @click="updateCompletedTimestamp(objective)" :variant="objective.completed ? 'success' : 'secondary'">
-							<!--<i class="fa" :class="[objective.completed ? 'fa-toggle-on' : 'fa-toggle-off']"></i>-->
-							<i class="fa" :class="[objective.completed ? 'fa-check-square-o' : 'fa-square-o']"></i>
-						</b-button>
-					</b-input-group-button>
-				</b-input-group>
-				<small class="form-text text-muted text-left">{{getReport(objective.report).week_of|mWeekToRange}}</small>
-			</b-form-group>
-
-			<div slot="footer">
-				<b-row class="justify-content-md-center">
-					<b-col cols="6" class="text-left">
-						<!--<b-btn variant="primary" @click.prevent="addObjective">Add a Objective</b-btn>-->
-					</b-col>
-					<b-col cols="6" class="text-right">
-						<b-btn :disabled="errors.any()" @click="next" variant="success">Next</b-btn>
-					</b-col>
-				</b-row>
-			</div>
-		</b-card>
-	</main>
-	</div>
+						<div slot="footer">
+							<b-row class="justify-content-md-center">
+								<b-col cols="6" class="text-left">
+									<!--<b-btn variant="primary" @click.prevent="addObjective">Add a Priority</b-btn>-->
+								</b-col>
+								<b-col cols="6" class="text-right">
+									<b-btn :disabled="errors.any()" @click="next" variant="success">Review</b-btn>
+								</b-col>
+							</b-row>
+						</div>
+					</b-card>
+				</div>
+			</b-row>
+		</b-container>
+	</section>
 </template>
-<style></style>
+<style scoped>
+	.inner-wrapper {
+		/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ef4137+1,f26725+100 */
+		background: #ef4137; /* Old browsers */
+		background: -moz-linear-gradient(45deg, #ef4137 1%, #f26725 100%); /* FF3.6-15 */
+		background: -webkit-linear-gradient(45deg, #ef4137 1%, #f26725 100%); /* Chrome10-25,Safari5.1-6 */
+		background: linear-gradient(45deg, #ef4137 1%, #f26725 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ef4137', endColorstr='#f26725', GradientType=1); /* IE6-9 fallback on horizontal gradient */
+	}
+	.custom-card {
+		border: 2px solid #3c4488;
+		border-radius: 0;
+		min-height: 400px;
+	}
+	.custom-card.dup {
+		position: absolute;
+	}
+	.custom-card.dup1 {
+		left: 7%;
+		top: 5%;
+	}
+	.custom-card.dup2 {
+		left: 10%;
+		top: 9%;
+	}
+</style>
 
 <script type="text/javascript">
   import _ from 'underscore';
-  import moment from 'moment';
-  // import { mapState } from 'vuex';
-  
+  import $ from 'jquery';
+  import { mapState } from 'vuex';
+  import swal from 'sweetalert';
+
   export default {
     name: 'Objectives',
     data() {
-      return {
-        objectives: [],
-        reports: [],
-        previousObjectives: [],
-        futureObjectives: [],
-      };
+      return {};
     },
-    computed: {
-      user() {
-        return this.$store.state.user;
-      },
-      currentReport() {
-        return this.$store.state.currentReport;
-      },
-      orderedPreviousObjectives() {
-        return [];
-      },
-      orderedFutureObjectives() {
-        return [];
-      },
-    },
+    computed: mapState(['user', 'week']),
     watch: {
-      currentReport(val) {
-        if (val.id) this.loadCurrentData();
+      user() {
+        this.addObjective();
       },
-      objectives(val) {
-        this.$root.collection.objectives = val;
+      // eslint-disable-next-line func-names
+      '$root.collection.objectives': function () {
+        this.$nextTick(() => {
+          $(this.$el).find('.dup').css('width', $(this.$el).find('.main').innerWidth());
+          $(this.$el).find('.dup').css('height', $(this.$el).find('.main').innerHeight());
+        });
       },
     },
     methods: {
@@ -114,120 +100,39 @@
       },
       addObjective() {
         const obj = {
-          // report: this.currentReport.ref.path,
-          report: this.currentReport.id,
           uid: this.user.uid,
           text: '',
-          completed: false,
-          completed_at: null,
-          week_of: this.currentReport.data
-            ? this.currentReport.data().week_of : this.currentReport.week_of,
+          bandwidth: null,
+          bandwidth_unit: 'hours',
+          // week_of: this.$route.params.week,
         };
-        this.$root.fbDatabase.collection('objectives').add(obj)
-          .then((docRef) => { this.objectives.push(_.extend({ id: docRef.id }, obj)); })
-          .catch((error) => {
-            console.error('Error adding document: ', error);
-          });
+        this.$root.collection.objectives.push(obj);
+      },
+      removeObj(index) {
+        swal('Remove Item', 'Would you like to remove this item?', 'warning', {
+          button: 'Yes',
+        }).then((value) => {
+          if (value) {
+            this.$root.collection.objectives.splice(index, 1);
+          }
+        });
       },
       updateCompletedTimestamp(objective) {
         // eslint-disable-next-line no-param-reassign
         objective.completed_at = objective.completed ? this.getServerTimestamp() : null;
-        // update objective
-        const item = _.extend({}, objective);
-        delete item.id;
-        this.$root.fbDatabase.collection('objectives').doc(objective.id).update(item)
-          .catch((error) => {
-            console.log('Synchronization failed: ', error);
-          });
-      },
-      // eslint-disable-next-line prefer-arrow-callback,func-names
-      debouncedUpdate: _.debounce(function (objective) {
-        const item = _.extend({}, objective);
-        delete item.id;
-        this.$root.fbDatabase.collection('objectives').doc(objective.id).update(item)
-          .catch((error) => {
-            console.log('Synchronization failed: ', error);
-          });
-      }, 250),
-      loadCurrentData() {
-        // get reports to correlate to objectives
-        this.$root.fbDatabase.collection('reports')
-          .where('uid', '==', this.user.uid)
-          .get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              this.reports.push(_.extend({ id: doc.id }, doc.data()));
-            });
-          })
-          .catch((error) => {
-            console.log('Error getting document: ', error);
-          });
-        // get/create objectives for the current report
-        this.$root.$firestore.objectives = this.$root.fbDatabase.collection('objectives')
-          .where('report', '==', this.currentReport.id)
-          .get()
-          .then((querySnapshot) => {
-            if (querySnapshot.empty) {
-              this.addObjective();
-              this.addObjective();
-            } else {
-              querySnapshot.forEach((doc) => {
-                const item = doc.data();
-                this.objectives.push(_.extend({ id: doc.id }, item));
-              });
-            }
-            this.loadOtherData();
-          })
-          .catch((error) => {
-            console.log('Synchronization failed: ', error);
-          });
-      },
-      loadOtherData() {
-        this.$root.fbDatabase.collection('objectives')
-          // .where('report', '<>', this.currentReport.id) // notEqual not available
-          .where('uid', '==', this.user.uid)
-          .where('completed', '==', false)
-          .orderBy('week_of')
-          .get()
-          .then((querySnapshot) => {
-            if (!querySnapshot.empty) {
-              querySnapshot.forEach((doc) => {
-                if (this.currentReport.id !== doc.data().report) {
-                  const weekOf = this.currentReport.data
-                    ? this.currentReport.data().week_of : this.currentReport.week_of;
-                  if (moment(doc.data().week_of, 'YYYY-[W]ww').isBefore(moment(weekOf, 'YYYY-[W]ww'), 'week')) {
-                    this.previousObjectives.push(_.extend({ id: doc.id }, doc.data()));
-                  } else {
-                    this.futureObjectives.push(_.extend({ id: doc.id }, doc.data()));
-                  }
-                }
-              });
-            }
-          })
-          .catch((error) => {
-            console.log('Synchronization failed: ', error);
-          });
       },
       next() {
-        const promises = [];
-        let wait = false;
-        this.objectives.forEach((objective) => {
-          if (objective.text === '') {
-            wait = true;
-            promises.push(this.$root.fbDatabase.collection('objectives').doc(objective.id).delete());
-          }
-        });
-        if (wait) {
-          Promise.all(promises).then(() => {
-            this.$router.push('opportunities');
-          });
-        } else this.$router.push('opportunities');
+        this.$root.$emit('to:review');
       },
     },
     mounted() {
-      if (this.currentReport) {
-        this.loadCurrentData();
+      if (this.user) {
+        // this.addObjective();
       }
+      setInterval(() => {
+        $(this.$el).find('.dup').css('width', $(this.$el).find('.main').innerWidth());
+        $(this.$el).find('.dup').css('height', $(this.$el).find('.main').innerHeight());
+      }, 1000);
     },
   };
 </script>

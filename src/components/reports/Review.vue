@@ -1,69 +1,40 @@
 <template>
-	<div class="col-sm-12 align-self-center mt-5 mb-5">
-		<main id="status_reports" role="main" class="inner cover">
-			<b-card title="Review of 1:1" :sub-title="`${weekMoment.startOf('w').format('MMM DD')} - ${weekMoment.endOf('w').format('MMM DD, YYYY')}`" header-text-variant="primary" class="mb-2">
+	<div class="offset-md-2 col-md-8 col-xs-12 align-self-center" style="padding-top: 4rem;">
+		<main role="main" class="inner cover">
+			<b-card class="mb-2">
+				<h4 class="card-title" style="color: #3c4488">Review of 1:1</h4>
+				<h6 class="card-subtitle">{{ weekMoment| mWeekToRange }}, {{ weekMoment.endOf('w').format('YYYY') }}</h6>
 				<b-card-body class="text-left">
-					<h4>WoWs
-						<b-btn class="float-right" size="sm" variant="outline-secondary" to="wows"><i
+					<h5>WoWs
+						<b-btn class="float-right review-edit-btn" size="sm" variant="outline-secondary" :to="`/reports/${$root.collection.weekOf}#WOWs`"><i
 								class="fa fa-edit"></i> Edit
 						</b-btn>
-					</h4>
-					<ol v-if="wows.length">
-						<li v-for="(wow, index) in wows" v-text="wow.text"></li>
-					</ol>
-					<p v-else>None Set</p>
-					<hr>
-					<h4>Objectives
-						<b-btn class="float-right" size="sm" variant="outline-secondary" to="objectives"><i
-								class="fa fa-edit"></i> Edit
-						</b-btn>
-					</h4>
-					<ol v-if="objectives.length">
-						<li v-for="(obj, index) in objectives">{{obj.text}}
-							 <b-badge :variant="obj.completed?'success':''">{{obj.completed?'Completed': 'Not Completed'}}</b-badge>
-						</li>
+					</h5>
+					<ol v-if="$root.collection.wows.length">
+						<li v-for="(wow, index) in $root.collection.wows" v-text="wow.text"></li>
 					</ol>
 					<p v-else>None Set</p>
 					<hr>
 
-					<h4>Opportunities
-						<b-btn class="float-right" size="sm" variant="outline-secondary" to="opportunities"><i
+					<h5>Serendipity
+						<b-btn class="float-right review-edit-btn" size="sm" variant="outline-secondary" :to="`/reports/${$root.collection.weekOf}#Serendipity`"><i
 								class="fa fa-edit"></i> Edit
 						</b-btn>
-					</h4>
-					<ol v-if="opportunities.length">
-						<li v-for="(opp, index) in opportunities" v-text="opp.text"></li>
+					</h5>
+					<ol v-if="$root.collection.opportunities.length">
+						<li v-for="(opp, index) in $root.collection.opportunities" v-text="opp.text"></li>
 					</ol>
 					<p v-else>None Set</p>
 					<hr>
 
-					<h4>Status Reports
-						<b-btn class="float-right" size="sm" variant="outline-secondary" to="status-reports"><i
+					<h5>Priorities
+						<b-btn class="float-right review-edit-btn" size="sm" variant="outline-secondary" :to="`/reports/${$root.collection.weekOf}#Priorities`"><i
 								class="fa fa-edit"></i> Edit
 						</b-btn>
-					</h4>
-					<b-table responsive="sm" v-if="status_reports.length" head-variant="dark" striped hover :items="status_reports"
-					         :fields="['item', 'stage', 'status', 'next_steps', 'who', 'date']">
-						<template slot="stage" slot-scope="data">
-							{{ getStageObject(data.value).name }}
-						</template>
-						<template slot="next_steps" slot-scope="data">
-							<b-table small striped outlined show-empty head-variant="dark" :items="data.value" :fields="stepsFields">
-								<template slot="text" slot-scope="data">
-									<div class="text-left">{{ data.value }}</div>
-								</template>
-								<template slot="who" slot-scope="data">
-									<b-badge class="mr-1" variant="primary" v-for="item in data.value" v-text="item"></b-badge>
-								</template>
-								<template slot="due_date" slot-scope="data">
-									<template v-if="data.value">{{ data.value | mFormat('ll') }}</template>
-								</template>
-							</b-table>
-						</template>
-						<template slot="date" slot-scope="data">
-							<template v-if="data.value">{{ data.value | mFormat('MMM DD') }}</template>
-						</template>
-					</b-table>
+					</h5>
+					<ol v-if="$root.collection.objectives.length">
+						<li v-for="(obj, index) in $root.collection.objectives">{{obj.text}} <b-badge variant="info">{{ obj.bandwidth }} {{ obj.bandwidth_unit }}</b-badge></li>
+					</ol>
 					<p v-else>None Set</p>
 				</b-card-body>
 				<div slot="footer">
@@ -71,15 +42,14 @@
 						<b-col class="text-right">
 							<b-button-group>
 								<b-dropdown variant="info" right text="Export 1:1">
-									<b-dropdown-item @click="exportAs('xml')">XML</b-dropdown-item>
-									<b-dropdown-item @click="exportAs('json')">JSON</b-dropdown-item>
+									<!--<b-dropdown-item @click="exportAs('xml')">XML</b-dropdown-item>-->
+									<!--<b-dropdown-item @click="exportAs('json')">JSON</b-dropdown-item>-->
 									<b-dropdown-header>CSV</b-dropdown-header>
-									<b-dropdown-item @click="exportAs('csv', 'wows')">WOWs</b-dropdown-item>
-									<b-dropdown-item @click="exportAs('csv', 'objectives')">Objectives</b-dropdown-item>
-									<b-dropdown-item @click="exportAs('csv', 'opportunities')">Opportunities</b-dropdown-item>
-									<b-dropdown-item @click="exportAs('csv', 'status-reports')">Status Reports</b-dropdown-item>
+									<b-dropdown-item @click="exportAs('csv', 'wows')">WOWs Only</b-dropdown-item>
+									<b-dropdown-item @click="exportAs('csv', 'opportunities')">Serendipity Only</b-dropdown-item>
+									<b-dropdown-item @click="exportAs('csv', 'objectives')">Priorities Only</b-dropdown-item>
 									<b-dropdown-divider></b-dropdown-divider>
-									<b-dropdown-item disabled @click="exportAs('print')">Print</b-dropdown-item>
+									<b-dropdown-item @click="exportAs('print')">Print</b-dropdown-item>
 								</b-dropdown>
 								<b-btn variant="outline-info" to="Home">Restart</b-btn>
 							</b-button-group>
@@ -90,102 +60,63 @@
 		</main>
 	</div>
 </template>
-<style></style>
+<style scoped>
+	.inner h4, .inner h6 { font-weight: 300; color: #333333 !important; }
+	.inner h4 {
+		color: #3c4488 !important;
+		font-size: 3rem;
+	}
+</style>
 <script type="text/javascript">
   /* eslint-disable no-case-declarations */
 
-  import _ from 'underscore';
+  import swal from 'sweetalert';
   import moment from 'moment';
   import FileSaver from 'file-saver';
   import ToCSV from 'json2csv';
   import converter from 'xml-js';
   import { mapState } from 'vuex';
 
+  // import user backgrounds
+  // import AndreaBG from './assets/bg/Andrea_bg image.png';
+  // import EthanBG from './assets/bg/Ethan_bg image.png';
+  // import GinnyBG from './assets/bg/Ginny_bg image.png';
+  // import HarpreetBG from './assets/bg/Harpreet_bg image.png';
+  // import JannekeBG from './assets/bg/Janneke_bg image.png';
+  // import KeerththanaBG from './assets/bg/Keerththana_bg image.png';
+  // import KeyanBG from './assets/bg/Keyan_bg image.png';
+  // import KriskaBG from './assets/bg/Kriska_bg image.png';
+  // import LeeBG from './assets/bg/Lee_bg image.png';
+  // import NayeonBG from './assets/bg/Nayeon_bg image.png';
+  // import OzgeBG from './assets/bg/Ozge_bg image.png';
+  // import TomBG from './assets/bg/Tom_bg image.png';
+  // import YsabelBG from './assets/bg/Ysabel_bg image.png';
+
+
   export default {
     name: 'Review',
     data() {
       return {
         weekMoment: moment(localStorage.SelectedWeek, 'YYYY-[W]ww'),
-        wows: [],
-        objectives: [],
-        opportunities: [],
-        status_reports: [],
-        stageOptions: [
-          { name: 'Initiate', code: 'I', value: '1' },
-          { name: 'Define', code: 'D1', value: '2' },
-          { name: 'Design', code: 'D2', value: '3' },
-          { name: 'Develop', code: 'D3', value: '4' },
-          { name: 'Deliver', code: 'D4', value: '5' },
-          { name: 'Close', code: 'C', value: '6' },
-        ],
-        stepsFields: [
-          { key: 'text', sortable: false },
-          { key: 'who', sortable: false },
-          { key: 'due_date', sortable: true },
-        ],
         moment,
       };
     },
-    computed: mapState(['user', 'currentReport']),
-    watch: {
-      currentReport(val) {
-        if (val.id) this.loadCurrentData();
-      },
-    },
+    computed: mapState(['user', 'week']),
     methods: {
-      getStageObject(val) {
-        return val ? _.findWhere(this.stageOptions, { value: val }) : '';
-      },
-      loadCurrentData() {
-        // Get Wows
-        this.$root.fbDatabase.collection('wows').where('report', '==', this.currentReport.id).get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              this.wows.push(_.extend({ id: doc.id }, doc.data()));
-            });
-          });
-        // Get Objectives
-        this.$root.fbDatabase.collection('objectives').where('report', '==', this.currentReport.id).get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              this.objectives.push(_.extend({ id: doc.id }, doc.data()));
-            });
-          });
-        // Get Opportunities
-        this.$root.fbDatabase.collection('opportunities').where('report', '==', this.currentReport.id).get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              this.opportunities.push(_.extend({ id: doc.id }, doc.data()));
-            });
-          });
-        // Get Status Reports
-        this.$root.fbDatabase.collection('status_reports')
-          .where('uid', '==', this.user.uid).where('week_of', '==', this.currentReport.data().week_of)
-          .get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              this.status_reports.push(_.extend({ id: doc.id }, doc.data()));
-            });
-          });
-      },
       exportAs(type, spec) {
         let blob;
         const blobs = {};
-        const reportObj = _.extend({ id: this.currentReport.id }, this.currentReport.data());
-        const weekMoment = moment(reportObj.week_of, 'YYYY-[W]ww');
+        const weekMoment = moment(this.week, 'YYYY-[W]ww');
         // build js object
         const object = {
           report: {
-            id: reportObj.id,
-            uid: reportObj.uid,
-            name: `${this.user.displayName} ${reportObj.week_of}`,
-            created_at: reportObj.created_at,
-            week_of: reportObj.week_of,
+            uid: this.user.uid,
+            name: `${this.user.displayName} ${this.week}`,
+            week_of: this.week,
             date_range: `${weekMoment.startOf('w').format('YYYY-MM-DD')} - ${weekMoment.endOf('w').format('YYYY-MM-DD')}`,
-            wows: this.wows,
-            objectives: this.objectives,
-            opportunities: this.opportunities,
-            statusReports: this.status_reports,
+            wows: this.$root.collection.wows,
+            objectives: this.$root.collection.objectives,
+            opportunities: this.$root.collection.opportunities,
           },
         };
 
@@ -202,11 +133,11 @@
             };
             const xml = `<?xml version="1.0" encoding="utf-8"?>\n${converter.json2xml(JSON.stringify(object), options)}`;
             blob = new Blob([xml], { type: 'text/plain;charset=utf-8' });
-            FileSaver.saveAs(blob, `${this.user.displayName} ${reportObj.week_of}.xml`);
+            FileSaver.saveAs(blob, `${this.user.displayName} ${object.report.week_of}.xml`);
             break;
           case 'json':
             blob = new Blob([JSON.stringify(object)], { type: 'text/plain;charset=utf-8' });
-            FileSaver.saveAs(blob, `${this.user.displayName} ${reportObj.week_of}.json`);
+            FileSaver.saveAs(blob, `${this.user.displayName} ${object.report.week_of}.json`);
             break;
             // eslint-disable-next-line no-case-declarations
           case 'csv':
@@ -215,22 +146,20 @@
                 case 'wows':
                   const wows = ToCSV({ data: object.report.wows });
                   blobs.wows = new Blob([wows], { type: 'text/csv;charset=utf-8' });
-                  FileSaver.saveAs(blobs.wows, `${this.user.displayName} ${reportObj.week_of}: WOWs.csv`);
+                  FileSaver.saveAs(blobs.wows, `${this.user.displayName} ${object.report.week_of}: WOWs.csv`);
+                  swal('Export 1:1', 'WOWs Exported', 'success');
                   break;
                 case 'objectives':
                   const objectives = ToCSV({ data: object.report.objectives });
-                  blob.objectives = new Blob([objectives], { type: 'text/csv;charset=utf-8' });
-                  FileSaver.saveAs(blobs.objectives, `${this.user.displayName} ${reportObj.week_of}: Objectives.csv`);
+                  blobs.objectives = new Blob([objectives], { type: 'text/csv;charset=utf-8' });
+                  FileSaver.saveAs(blobs.objectives, `${this.user.displayName} ${object.report.week_of}: Priorities.csv`);
+                  swal('Export 1:1', 'Priorities Exported', 'success');
                   break;
                 case 'opportunities':
                   const opportunities = ToCSV({ data: object.report.opportunities });
                   blobs.opportunities = new Blob([opportunities], { type: 'text/csv;charset=utf-8' });
-                  FileSaver.saveAs(blobs.opportunities, `${this.user.displayName} ${reportObj.week_of}: Opportunities.csv`);
-                  break;
-                case 'status-reports':
-                  const statusReports = ToCSV({ data: object.report.statusReports });
-                  blobs.statusReports = new Blob([statusReports], { type: 'text/csv;charset=utf-8' });
-                  FileSaver.saveAs(blobs.statusReports, `${this.user.displayName} ${reportObj.week_of}: Status Reports.csv`);
+                  FileSaver.saveAs(blobs.opportunities, `${this.user.displayName} ${object.report.week_of}: Serendipity.csv`);
+                  swal('Export 1:1', 'Serendipity Exported', 'success');
                   break;
                 default:
                   break;
@@ -239,8 +168,11 @@
               // Errors are thrown for bad options, or
               // if the data is empty and no fields are provided.
               // Be sure to provide fields if it is possible that your data array will be empty.
-              console.error(err);
+              swal('Something went wrong!', err, 'error');
             }
+            break;
+          case 'print':
+            window.print();
             break;
           default:
             break;
@@ -248,8 +180,14 @@
       },
     },
     mounted() {
-      if (this.currentReport) {
-        this.loadCurrentData();
+      if (!this.$root.collection.weekOf) {
+        this.$getItem(this.$route.params.week, (error, data) => {
+          if (!error) {
+            this.$root.collection = data;
+          } else {
+            this.$root.collection.weekOf = this.$route.params.week;
+          }
+        });
       }
     },
   };

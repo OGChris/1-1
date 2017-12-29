@@ -1,89 +1,65 @@
 <template>
-	<div class="col">
-			<!--<h2 class="text-white">Report for {{ $route.params.week }}</h2>-->
-			<div class="stepwizard col">
-				<div class="stepwizard-row setup-panel row">
-					<div class="stepwizard-step col" v-for="(child, index) in children">
-						<b-btn :to="child.path || child.name" :variant="$route.name === child.name ? 'primary' : 'dark'" class="btn-circle" v-text="index+1"></b-btn>
-						<p>
-							<b-link :to="child.path || child.name" :class="$route.name === child.name ? 'text-primary' : 'text-dark'" v-text="child.name"></b-link>
-						</p>
-
-					</div>
-				</div>
-			</div>
-			<div class="container">
-
-				<transition @enter="enter" @leave="leave" :css="false" appear>
-					<router-view></router-view>
-				</transition>
-			</div>
+	<div class="wrapper">
+		<div v-if="ready" id="fullpage">
+			<wows :preloaded="preloaded"></wows>
+			<opportunities></opportunities>
+			<objectives></objectives>
 		</div>
+		<b-container class="avatar-overlay ml-5">
+			<b-row style="display: table-cell;vertical-align: middle;">
+				<div class="col-xs-12 align-self-center">
+					<b-img :src="user && user.photoURL ? user.photoURL : $root.defaultAvatar" center fluid rounded="circle" alt="Avatar" />
+				</div>
+			</b-row>
+		</b-container>
+
+	</div>
 </template>
 <style>
-	.stepwizard-step p {
-		margin-top: 10px;
+	.wrapper {
+		min-height: 100%;
+		height: -webkit-fill-available;
+		height: -moz-fill-available;
 	}
-
-	.stepwizard-row {
-		/*display: table-row;*/
+	.inner-wrapper row {
+		z-index: 10;
 	}
-
-	.stepwizard {
-		/*display: table;*/
-		width: 100%;
-		position: relative;
+	.avatar-overlay  {
+		width: 25%;
+		min-height: 100%;
+		min-height: -webkit-fill-available;
+		min-height: -moz-fill-available;
+		position: fixed;
+		display: table;
+		top: 0
 	}
-
-	.stepwizard-step button[disabled] {
-		opacity: 1 !important;
-		filter: alpha(opacity=100) !important;
-	}
-
-	.stepwizard-row:before {
-		top: 14px;
-		bottom: 0;
-		position: absolute;
-		content: " ";
-		width: 100%;
-		height: 1px;
-		background-color: #ccc;
-		z-order: 0;
-
-	}
-
-	.stepwizard-step {
-		/*display: table-cell;*/
-		text-align: center;
-		position: relative;
-	}
-
-	.btn-circle {
-		width: 30px;
-		height: 30px;
-		text-align: center;
-		padding: 6px 0;
-		font-size: 12px;
-		line-height: 1.428571429;
-		border-radius: 15px;
+	.inner-wrapper h4, .inner-wrapper h6 { text-align: left; font-weight: 300; color: #333333 !important; }
+	.inner-wrapper h4 {
+		color: #3c4488 !important;
+		font-size: 3rem;
 	}
 </style>
 <script type="text/javascript">
+  /* eslint-disable no-unused-vars,no-param-reassign */
+  import $ from 'jquery';
+  import { mapState } from 'vuex';
+
   import { TimelineMax, TweenMax, Power4 } from 'gsap';
+  import wows from './Wows';
+  import opportunities from './Opportunities';
+  import objectives from './Objectives';
+
 
   export default {
     name: 'wrapper',
+    components: { wows, opportunities, objectives },
     data() {
       return {
-        children: [
-          { name: 'WoWs' },
-          { name: 'Objectives' },
-          { name: 'Opportunities' },
-          { name: 'Status Reports', path: 'status-reports' },
-          { name: 'Review' },
-        ],
+        ready: false,
+        preloaded: false,
       };
     },
+    computed: mapState(['user', 'week']),
     methods: {
       enter(el, done) {
         const tl = new TimelineMax({
@@ -111,8 +87,86 @@
           onComplete: done,
         });
       },
+      initFullPage() {
+        const self = this;
+        $('#fullpage').fullpage({
+          // Navigation
+          anchors: ['WOWs', 'Serendipity', 'Priorities'],
+          navigation: true,
+          navigationPosition: 'right',
+          navigationTooltips: ['WOWs', 'Serendipity', 'Priorities'],
+          // Scrolling
+          css3: true,
+          scrollbar: true,
+          scrollOverflow: true,
+          // normalScrollElements: '.card-body',
+          // autoScrolling: false,
+          // Accessibility
+          keyboardScrolling: true,
+          animateAnchor: true,
+          recordHistory: true,
+          // Events
+          // eslint-disable-next-line no-unused-vars
+          onLeave(index, nextIndex, direction) {
+            if (nextIndex === 1) {
+              self.$root.$emit('header:type', 'light');
+            }
+            // if (index === 3) {
+            //   $.fn.fullpage.setAutoScrolling(true);
+            // }
+          },
+          // eslint-disable-next-line no-unused-vars
+          afterLoad(anchorLink, index) {
+            if (index !== 1) {
+              self.$root.$emit('header:type', 'dark');
+            }
+            // if (index === 3) {
+            //   $.fn.fullpage.setAutoScrolling(false);
+            // }
+          },
+          // eslint-disable-next-line no-unused-vars
+          afterRender() {
+            // console.log('Loaded');
+          },
+        });
+        // console.log('Init fullpage.js');
+      },
+    },
+    beforeRouteEnter(to, from, next) {
+      next((vm) => {
+        if (!vm.$root.collection.weekOf) {
+          vm.$getItem(vm.$route.params.week, (error, data) => {
+            if (!error) {
+              vm.$root.collection = data;
+              vm.preloaded = true;
+            } else {
+              vm.$root.collection.weekOf = vm.$route.params.week;
+            }
+            vm.ready = true;
+            // let components initiate then load fullpage.js on next tick
+            vm.$nextTick(() => {
+              vm.initFullPage();
+            });
+          });
+        } else {
+          vm.ready = true;
+          // let components initiate then load fullpage.js on next tick
+          vm.$nextTick(() => {
+            vm.initFullPage();
+          });
+        }
+      });
+    },
+    beforeRouteLeave(to, from, next) {
+      this.$root.$emit('header:type', 'light');
+      $.fn.fullpage.destroy('all');
+      next();
     },
     mounted() {
+      // to review
+      this.$root.$on('to:review', () => {
+        this.$router.push(`/reports/${this.$root.collection.weekOf}/review`);
+      });
     },
   };
 </script>

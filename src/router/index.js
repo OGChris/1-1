@@ -2,23 +2,14 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Hello from '@/components/Hello';
-import Auth from '@/components/auth';
 
 // Forms
 import ReportWrapper from '@/components/reports/wrapper';
-import Wows from '@/components/reports/Wows';
-import Objectives from '@/components/reports/Objectives';
-import Opportunities from '@/components/reports/Opportunities';
-import StatusReports from '@/components/reports/StatusReports';
+// import Wows from '@/components/reports/Wows';
+// import Objectives from '@/components/reports/Objectives';
+// import Opportunities from '@/components/reports/Opportunities';
+// import StatusReports from '@/components/reports/StatusReports';
 import Review from '@/components/reports/Review';
-
-// Admin Components
-import AdminWrapper from '@/components/admin/wrapper';
-import AdminDashboard from '@/components/admin/dashboard';
-import AdminWows from '@/components/admin/wows';
-import AdminObjectives from '@/components/admin/objectives';
-import AdminOpportunities from '@/components/admin/opportunities';
-import AdminStatusReports from '@/components/admin/status-reports';
 
 Vue.use(Router);
 // eslint-disable-next-line import/no-mutable-exports,prefer-const
@@ -38,7 +29,7 @@ let router = new Router({
       path: '/reports/:week',
       component: ReportWrapper,
       props: true,
-      children: [
+      /* children: [
         {
           path: 'wows',
           name: 'WoWs',
@@ -79,47 +70,15 @@ let router = new Router({
             requiresAuth: true,
           },
         },
-      ],
+      ], */
     },
     {
-      path: '/admin',
-      component: AdminWrapper,
-      children: [
-        {
-          path: '',
-          name: 'Dashboard',
-          component: AdminDashboard,
-        },
-        {
-          path: 'wows',
-          name: 'WOWs',
-          component: AdminWows,
-        },
-        {
-          path: 'objectives',
-          name: 'Objectives',
-          component: AdminObjectives,
-        },
-        {
-          path: 'opportunities',
-          name: 'Opportunities',
-          component: AdminOpportunities,
-        },
-        {
-          path: 'status-reports',
-          name: 'Status Reports',
-          component: AdminStatusReports,
-        },
-      ],
+      path: '/reports/:week/review',
+      name: 'Review',
+      component: Review,
       meta: {
         requiresAuth: true,
-        requiresAdmin: true,
       },
-    },
-    {
-      path: '/auth',
-      name: 'Authentication',
-      component: Auth,
     },
   ],
 });

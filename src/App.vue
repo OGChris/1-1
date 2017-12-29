@@ -1,65 +1,23 @@
 <template>
-	<div class="app-root mt-5 pt-5" style="height: 100%;">
+	<div class="app-root">
 		<shared-header></shared-header>
 
 		<transition @enter="enter" @leave="leave" :css="false" appear>
 			<router-view></router-view>
 		</transition>
 
-		<b-modal id="historyModal" title="View History" size="lg" ok-only ok-title="Close">
-			<template v-if="activeHistory.length">
-				<h4 v-text="`${activeHistory[0].item} Timeline`"></h4>
-				<b-table responsive="sm" small head-variant="dark" striped hover :items="activeHistory"
-				         :fields="['stage', 'status', 'next_steps', 'who', 'date', 'week_of']">
-					<template slot="stage" slot-scope="data">
-						{{ getStageObject(data.value).name }}
-					</template>
-					<template slot="next_steps" slot-scope="data">
-						<b-table small striped outlined show-empty head-variant="dark" :items="data.value" :fields="stepsFields">
-							<template slot="text" slot-scope="data">
-								<div class="text-left">{{ data.value }}</div>
-							</template>
-							<template slot="who" slot-scope="data">
-								<b-badge class="mr-1" variant="primary" v-for="item in data.value" v-text="item"></b-badge>
-							</template>
-							<template slot="due_date" slot-scope="data">
-								<template v-if="data.value">{{ data.value | mFormat('ll') }}</template>
-							</template>
-						</b-table>
-					</template>
-					<template slot="date" slot-scope="data">{{data.value|mFormat('ll')}}</template>
-					<template slot="week_of" slot-scope="data">{{data.value|mWeekToRange}}</template>
-				</b-table>
-			</template>
-
-		</b-modal>
-
 	</div>
 </template>
 
 <script>
   import _ from 'underscore';
+  import swal from 'sweetalert';
   import $ from 'jquery';
   import moment from 'moment';
   import Firebase from 'firebase';
 
   import { mapState } from 'vuex';
   import { TimelineMax, TweenMax, Power4 } from 'gsap';
-
-  // import user backgrounds
-  import AndreaBG from './assets/bg/Andrea_bg image.png';
-  import EthanBG from './assets/bg/Ethan_bg image.png';
-  import GinnyBG from './assets/bg/Ginny_bg image.png';
-  import HarpreetBG from './assets/bg/Harpreet_bg image.png';
-  import JannekeBG from './assets/bg/Janneke_bg image.png';
-  import KeerththanaBG from './assets/bg/Keerththana_bg image.png';
-  import KeyanBG from './assets/bg/Keyan_bg image.png';
-  import KriskaBG from './assets/bg/Kriska_bg image.png';
-  import LeeBG from './assets/bg/Lee_bg image.png';
-  import NayeonBG from './assets/bg/Nayeon_bg image.png';
-  import OzgeBG from './assets/bg/Ozge_bg image.png';
-  import TomBG from './assets/bg/Tom_bg image.png';
-  import YsabelBG from './assets/bg/Ysabel_bg image.png';
 
   export default {
     name: 'app',
@@ -82,23 +40,28 @@
         ],
       };
     },
-    computed: mapState(['user']),
+    computed: mapState(['user', 'week']),
     watch: {
       $route(to, from) {
         const toDepth = to.path.split('/').length;
         const fromDepth = from.path.split('/').length;
         this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left';
       },
-      user(val) {
-        // eslint-disable-next-line max-len
-        const backgrounds = { AndreaBG, EthanBG, GinnyBG, HarpreetBG, JannekeBG, KeerththanaBG, KeyanBG, KriskaBG, LeeBG, NayeonBG, OzgeBG, TomBG, YsabelBG };
-        if (val && backgrounds) {
-          // const bg = _.find(backgrounds, item => item);
-          // eslint-disable-next-line max-len
-          const bg = _.find(backgrounds, item => item.toLowerCase().includes(val.displayName.split(' ')[0].toLowerCase())) || JannekeBG;
-          if (bg) this.changeBackground(bg);
-        }
+      week() {
+        debugger;
       },
+      /* user(val) {
+        // eslint-disable-next-line max-len
+        // const backgrounds = { AndreaBG, EthanBG, GinnyBG, HarpreetBG, JannekeBG, KeerththanaBG,
+        KeyanBG, KriskaBG, LeeBG, NayeonBG, OzgeBG, TomBG, YsabelBG };
+        // if (val && backgrounds) {
+        // const bg = _.find(backgrounds, item => item);
+        // eslint-disable-next-line max-len
+        // const bg = _.find(backgrounds, item => item.toLowerCase()
+        .includes(val.displayName.split(' ')[0].toLowerCase())) || JannekeBG;
+        // if (bg) this.changeBackground(bg);
+        // }
+      }, */
     },
     beforeCreate() {
       const self = this;
@@ -123,7 +86,7 @@
               });
             })
             .catch((error) => {
-              console.log('Error getting document: ', error);
+              swal('Something went wrong!', error, 'error');
             });
         }
       });
@@ -179,13 +142,10 @@
       },
     },
     mounted() {
-      this.$root.$on('HistoryModal:SET', (data) => {
-        this.activeHistory = data;
-      });
-
-      this.$root.$on('HistoryModal:CLEAR', () => {
-        this.activeHistory = null;
-      });
+      const week = localStorage.selectedWeek;
+      if (week) {
+        this.$store.commit('setWeek', week);
+      }
     },
   };
 </script>
@@ -203,11 +163,11 @@
 	html {
 		height: 100%;
 		/*overflow-y: hidden;*/
-		background-image: url('assets/bg1.jpg');
-		background-color: transparent;
-		background-size: cover;
-		background-position: center center;
-		background-attachment: fixed;
+		/*background-image: url('assets/bg1.jpg');*/
+		background-color: white;
+		/*background-size: cover;*/
+		/*background-position: center center;*/
+		/*background-attachment: fixed;*/
 	}
 	html,
 	body {
@@ -220,20 +180,15 @@
 
 	body {
 		color: #333333;
-		background: transparent;
+		background: white;
 		text-align: center;
 	}
 
 	.app-root {
+		min-height: 100%;
+		height: -webkit-fill-available;
+		height: -moz-fill-available;
 		/*background-color: rgba(255, 255, 255, .5);*/
-	}
-
-	/* P5 Canvas styles */
-	canvas#defaultCanvas0 {
-		position: absolute;
-		top: 0;
-		left: 0;
-		z-index: -1;
 	}
 
 	/* Extra markup and styles for table-esque vertical and horizontal centering */
@@ -329,6 +284,10 @@
 		.cover-container {
 			width: 42rem;
 		}
+	}
+
+	@media print {
+		#nav_collapse, .navbar-toggler, .dropdown-menu, .card-footer, .review-edit-btn { display: none !important;}
 	}
 
 	/*
