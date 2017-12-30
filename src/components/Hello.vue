@@ -5,7 +5,8 @@
 				<template v-if="!user">
 					<h1 class="text-white">{{ heading }}</h1>
 					<!--<template v-if="showAvatarLogin">-->
-						<b-card title="Select your Avatar">
+						<b-card>
+							<h4 class="card-title" style="color: #3c4488;font-size: 3rem;font-weight: 300;">Select your Avatar</h4>
 							<b-btn variant="outline-primary" class="m-1" v-for="(avatar, key) in avatars" :key="key" @click="loginAvatarSelected(key)">
 								<b-img :src="avatar" rounded="circle" width="50" height="50" blank-color="#777" alt="img" class="m-1" />
 								<br>{{ key }}
@@ -143,9 +144,9 @@
 								<b-btn type="submit" variant="primary" :disabled="disableButton">
 									{{ currentReport ? 'Continue' : 'Begin'}}
 								</b-btn>
-								<!--<b-btn @click="toReview" :disabled="disableButton || !currentReport">
+								<b-btn @click="toReview" :disabled="disableButton || !currentReport">
 									Review
-								</b-btn>-->
+								</b-btn>
 							</b-input-group-button>
 						</b-input-group>
 
@@ -157,9 +158,9 @@
 							<b-btn type="submit" variant="primary" :disabled="disableButton">
 								{{ currentReport ? 'Continue' : 'Begin'}}
 							</b-btn>
-							<!--<b-btn @click="toReview" :disabled="disableButton || !currentReport">
+							<b-btn @click="toReview" :disabled="disableButton || !currentReport">
 								Review
-							</b-btn>-->
+							</b-btn>
 						</b-btn-group>
 					</b-form>
 
@@ -178,6 +179,8 @@
 	.hello {
 		min-height: 500px;
 	}
+
+	.hello .card { border: none; }
 
 	.dp-input {
 		width: 240px;
@@ -218,7 +221,7 @@
         minWeek: moment().subtract(1, 'weeks').format('YYYY-[W]ww'),
         maxWeek: moment().add(1, 'weeks').format('YYYY-[W]ww'),
         weekOf: localStorage.SelectedWeek || moment().format('YYYY-[W]ww'),
-        weekOfObj: moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() || moment().day('Monday').toDate(),
+        weekOfObj: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() : moment().day('Monday').toDate(),
         highlightedDates: {
           from: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() : moment().day('Monday').toDate(),
           to: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Friday').toDate() : moment().day('Friday').toDate(),
@@ -355,24 +358,34 @@
       },
       weekChanged(val) {
         localStorage.SelectedWeek = val;
+        this.checkForRecord();
       },
       beginReport() {
         localStorage.SelectedWeek = this.weekOf;
-        this.$root.collection.weekOf = this.weekOf;
+        if (!this.currentReport) {
+          this.$root.collection = {
+            weekOf: this.weekOf,
+            wows: [],
+            objectives: [],
+            opportunities: [],
+          };
+        }
+        if (!this.$root.collection.weekOf) {
+          this.$root.collection.weekOf = this.weekOf;
+        }
         this.$router.push(`reports/${this.weekOf}`);
       },
       toReview() {
         localStorage.SelectedWeek = this.weekOf;
-        this.$root.collection.weekOf = this.weekOf;
         this.$router.push(`reports/${this.weekOf}/review`);
       },
       checkForRecord() {
         this.$getItem(this.weekOf, (error, data) => {
-          if (!error) {
+          if (data) {
             this.$root.collection = data;
             this.currentReport = true;
           } else {
-            this.$root.collection.weekOf = this.weekOf;
+            this.currentReport = false;
           }
         });
       },

@@ -57,6 +57,16 @@
 		border-radius: 0;
 		min-height: 400px;
 	}
+	.custom-card.main:before {
+		content: ' ';
+		background: transparent url('../../assets/pencil.png') center center no-repeat;
+		background-size: contain;
+		width: 30px;
+		height: 155px;
+		position: absolute;
+		top: 20px;
+		right: 15px;
+	}
 	.custom-card.dup {
 		position: absolute;
 	}
@@ -102,7 +112,7 @@
         const obj = {
           uid: this.user.uid,
           text: '',
-          bandwidth: null,
+          bandwidth: 0,
           bandwidth_unit: 'hours',
           // week_of: this.$route.params.week,
         };

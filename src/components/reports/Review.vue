@@ -182,7 +182,7 @@
     mounted() {
       if (!this.$root.collection.weekOf) {
         this.$getItem(this.$route.params.week, (error, data) => {
-          if (!error) {
+          if (data) {
             this.$root.collection = data;
           } else {
             this.$root.collection.weekOf = this.$route.params.week;

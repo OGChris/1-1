@@ -47,9 +47,6 @@
         const fromDepth = from.path.split('/').length;
         this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left';
       },
-      week() {
-        debugger;
-      },
       /* user(val) {
         // eslint-disable-next-line max-len
         // const backgrounds = { AndreaBG, EthanBG, GinnyBG, HarpreetBG, JannekeBG, KeerththanaBG,

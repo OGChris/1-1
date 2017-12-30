@@ -136,7 +136,7 @@
       next((vm) => {
         if (!vm.$root.collection.weekOf) {
           vm.$getItem(vm.$route.params.week, (error, data) => {
-            if (!error) {
+            if (data) {
               vm.$root.collection = data;
               vm.preloaded = true;
             } else {
