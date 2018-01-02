@@ -79,7 +79,7 @@
 							{{selectedLoginAvatar.displayName || selectedLoginAvatar.email}}
 						</div>
 						<br>
-						<b-form id="login" data-vv-scope="login">
+						<b-form id="login" data-vv-scope="login" @submit.prevent="login">
 							<b-form-group id="login-password-group" label-for="login-password">
 								<b-form-input ref="focusThis" v-model="loginData.password" id="login-password" type="password"
 								              placeholder="Enter your password"></b-form-input>
