@@ -69,6 +69,7 @@
     methods: {
       signOut() {
         this.$removeItem('auth');
+        window.location.reload();
       },
     },
     mounted() {
