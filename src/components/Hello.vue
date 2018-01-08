@@ -34,7 +34,7 @@
 									<p v-else v-text="loginError.message"></p>
 								</template>
 							</b-form-group>
-							<b-btn variant="outline-secondary" @click.prevent="requestPasswordReset">Forgot your password?</b-btn>
+							<!--<b-btn variant="outline-secondary" @click.prevent="requestPasswordReset">Forgot your password?</b-btn>-->
 						</b-form>
 					</b-modal>
 
@@ -224,6 +224,8 @@
             self.$store.commit('setUser', account);
             self.$setItem('auth', account);
             this.loading = false;
+          } else {
+            this.loginError = { code: 'auth/wrong-password', message: 'Incorrect password. Please check you credentials.' };
           }
         }
       },
