@@ -1,57 +1,76 @@
 <template>
-	<div class="offset-md-2 col-md-8 col-xs-12 align-self-center" style="padding-top: 4rem;">
+	<div class="offset-md-2 col-md-8 col-xs-12 align-self-center review-container">
 		<main role="main" class="inner cover">
 			<b-card class="mb-2">
-				<h4 class="card-title" style="color: #3c4488">Review of 1:1</h4>
-				<h6 class="card-subtitle">{{ weekMoment| mWeekToRange }}, {{ weekMoment.endOf('w').format('YYYY') }}</h6>
-				<b-card-body class="text-left">
-					<h5>WoWs
-						<b-btn class="float-right review-edit-btn" size="sm" variant="outline-secondary" :to="`/reports/${$root.collection.weekOf}#WOWs`"><i
-								class="fa fa-edit"></i> Edit
-						</b-btn>
-					</h5>
-					<ol v-if="$root.collection.wows.length">
-						<li v-for="(wow, index) in $root.collection.wows" v-text="wow.text"></li>
-					</ol>
-					<p v-else>None Set</p>
-					<hr>
+				<b-row>
+					<b-col cols="8" class="text-left">
+						<b-media no-body>
+							<b-media-aside vertical-align="center">
+								<b-img :src="user && user.photoURL ? user.photoURL : $root.defaultAvatar" height="70" center rounded="circle" alt="Avatar" />
+							</b-media-aside>
+							<b-media-body class="ml-3">
+								<h2 class="font-weight-light mt-3 ml-2" style="color: #3c4488">1:1 Update</h2>
+							</b-media-body>
+						</b-media>
+					</b-col>
+					<b-col cols="4" class="text-right">
+						<h6 class="font-weight-bold" v-if="user">{{ user.displayName }}</h6>
+						<h6 class="font-weight-light">{{ weekMoment| mWeekToRange }}, {{ weekMoment.endOf('w').format('YYYY') }}</h6>
 
-					<h5>Serendipity
-						<b-btn class="float-right review-edit-btn" size="sm" variant="outline-secondary" :to="`/reports/${$root.collection.weekOf}#Serendipity`"><i
-								class="fa fa-edit"></i> Edit
-						</b-btn>
-					</h5>
-					<ol v-if="$root.collection.opportunities.length">
-						<li v-for="(opp, index) in $root.collection.opportunities" v-text="opp.text"></li>
-					</ol>
-					<p v-else>None Set</p>
-					<hr>
-
-					<h5>Priorities
-						<b-btn class="float-right review-edit-btn" size="sm" variant="outline-secondary" :to="`/reports/${$root.collection.weekOf}#Priorities`"><i
-								class="fa fa-edit"></i> Edit
-						</b-btn>
-					</h5>
-					<ol v-if="$root.collection.objectives.length">
-						<li v-for="(obj, index) in $root.collection.objectives">{{obj.text}} <b-badge variant="info">{{ obj.bandwidth }} {{ obj.bandwidth_unit }}</b-badge></li>
-					</ol>
-					<p v-else>None Set</p>
+					</b-col>
+				</b-row>
+				<b-card-body class="text-left mt-3">
+					<section class="review-section wows-section">
+						<h5 class="text-primary">WOWs
+							<b-btn class="float-right review-edit-btn text-secondary" size="sm" variant="link" :to="`/reports/${$root.collection.weekOf}#WOWs`"><i
+									class="fa fa-edit"></i>
+							</b-btn>
+						</h5>
+						<ol v-if="$root.collection.wows.length">
+							<li v-for="(wow, index) in $root.collection.wows" v-text="wow.text"></li>
+						</ol>
+						<p v-else>None Set</p>
+						<hr class="mt-4 mb-2">
+					</section>
+					<section class="review-section serendipity-section">
+						<h5 class="text-primary">Serendipity
+							<b-btn class="float-right review-edit-btn text-secondary" size="sm" variant="link" :to="`/reports/${$root.collection.weekOf}#Serendipity`"><i
+									class="fa fa-edit"></i>
+							</b-btn>
+						</h5>
+						<ol v-if="$root.collection.opportunities.length">
+							<li v-for="(opp, index) in $root.collection.opportunities" v-text="opp.text"></li>
+						</ol>
+						<p v-else>None Set</p>
+						<hr class="mt-4 mb-2">
+					</section>
+					<section class="review-section priorities-section">
+						<h5 class="text-primary">Priorities
+							<b-btn class="float-right review-edit-btn text-secondary" size="sm" variant="link" :to="`/reports/${$root.collection.weekOf}#Priorities`"><i
+									class="fa fa-edit"></i>
+							</b-btn>
+						</h5>
+						<ol v-if="$root.collection.objectives.length">
+							<li v-for="(obj, index) in $root.collection.objectives">{{obj.text}} <b-badge variant="info" v-if="obj.text">{{ obj.bandwidth }} {{ obj.bandwidth_unit }}</b-badge></li>
+						</ol>
+						<p v-else>None Set</p>
+					</section>
 				</b-card-body>
 				<div slot="footer">
 					<b-row>
 						<b-col class="text-right">
 							<b-button-group>
-								<b-dropdown variant="info" right text="Export 1:1">
+								<b-btn variant="outline-secondary" @click="exportAs('print')">Print</b-btn>
+								<b-dropdown variant="outline-secondary" right text="Export 1:1">
 									<!--<b-dropdown-item @click="exportAs('xml')">XML</b-dropdown-item>-->
 									<!--<b-dropdown-item @click="exportAs('json')">JSON</b-dropdown-item>-->
 									<b-dropdown-header>CSV</b-dropdown-header>
+									<b-dropdown-item @click="exportAs('csv', 'all')">All</b-dropdown-item>
 									<b-dropdown-item @click="exportAs('csv', 'wows')">WOWs Only</b-dropdown-item>
 									<b-dropdown-item @click="exportAs('csv', 'opportunities')">Serendipity Only</b-dropdown-item>
 									<b-dropdown-item @click="exportAs('csv', 'objectives')">Priorities Only</b-dropdown-item>
-									<b-dropdown-divider></b-dropdown-divider>
-									<b-dropdown-item @click="exportAs('print')">Print</b-dropdown-item>
 								</b-dropdown>
-								<b-btn variant="outline-info" to="Home">Restart</b-btn>
+								<b-btn variant="secondary" to="Home">Restart</b-btn>
 							</b-button-group>
 						</b-col>
 					</b-row>
@@ -66,11 +85,15 @@
 		color: #3c4488 !important;
 		font-size: 3rem;
 	}
+	.review-container {
+		padding-top: 4rem;
+	}
 </style>
 <script type="text/javascript">
-  /* eslint-disable no-case-declarations */
+  /* eslint-disable no-case-declarations,no-param-reassign,no-unreachable */
 
   import swal from 'sweetalert';
+  import _ from 'underscore';
   import moment from 'moment';
   import FileSaver from 'file-saver';
   import ToCSV from 'json2csv';
@@ -97,6 +120,7 @@
     name: 'Review',
     data() {
       return {
+        _,
         weekMoment: moment(localStorage.SelectedWeek, 'YYYY-[W]ww'),
         moment,
       };
@@ -105,15 +129,32 @@
     methods: {
       exportAs(type, spec) {
         let blob;
-        const blobs = {};
-        const weekMoment = moment(this.week, 'YYYY-[W]ww');
+        const blobs = {
+          setValueFromRow(row, unit) {
+            if (row.data.type === 'Priorities') {
+              return row.data.bandwidth_unit === unit ? row.data.bandwidth : null;
+            }
+            return null;
+          },
+        };
+        const weekMoment = moment(this.$route.params.week, 'YYYY-[W]ww');
         // build js object
         const object = {
           report: {
-            uid: this.user.uid,
-            name: `${this.user.displayName} ${this.week}`,
-            week_of: this.week,
+            // uid: this.user.uid,
+            name: this.user.displayName,
+            date_created: moment().format('DD-MM-YYYY'),
+            week_of: this.$route.params.week,
+            week_number: moment(this.$route.params.week, 'YYYY-[W]ww').format('w'),
+            week_date_start: weekMoment.startOf('w').format('DD-MM-YYYY'),
+            week_date_end: weekMoment.endOf('w').format('DD-MM-YYYY'),
             date_range: `${weekMoment.startOf('w').format('YYYY-MM-DD')} - ${weekMoment.endOf('w').format('YYYY-MM-DD')}`,
+            // eslint-disable-next-line max-len
+            data: _.union(
+              _.each(this.$root.collection.wows, (a) => { a.type = 'WOWs'; }),
+              _.each(this.$root.collection.opportunities, (a) => { a.type = 'Serendipity'; }),
+              _.each(this.$root.collection.objectives, (a) => { a.type = 'Priorities'; }),
+            ),
             wows: this.$root.collection.wows,
             objectives: this.$root.collection.objectives,
             opportunities: this.$root.collection.opportunities,
@@ -133,7 +174,7 @@
             };
             const xml = `<?xml version="1.0" encoding="utf-8"?>\n${converter.json2xml(JSON.stringify(object), options)}`;
             blob = new Blob([xml], { type: 'text/plain;charset=utf-8' });
-            FileSaver.saveAs(blob, `${this.user.displayName} ${object.report.week_of}.xml`);
+            // FileSaver.saveAs(blob, `${this.user.displayName} ${object.report.week_of}.xml`);
             break;
           case 'json':
             blob = new Blob([JSON.stringify(object)], { type: 'text/plain;charset=utf-8' });
@@ -143,6 +184,28 @@
           case 'csv':
             try {
               switch (spec) {
+                case 'all':
+                  const all = ToCSV({
+                    data: object.report,
+                    defaultValue: 'null',
+                    unwindPath: ['data'],
+                    fields: [
+                      { label: 'Date Completed', value: 'date_created' },
+                      { label: 'Week #', value: 'week_number' },
+                      { label: 'Week Date Start', value: 'week_date_start' },
+                      { label: 'Week Date End', value: 'week_date_end' },
+                      { label: 'Name', value: 'name' },
+                      { label: 'Type', value: 'data.type' },
+                      { label: 'Text', value: 'data.text' },
+                      { label: 'Time (Hours)', value: row => blobs.setValueFromRow(row, 'hours') },
+                      { label: 'Time (Days)', value: row => blobs.setValueFromRow(row, 'days') },
+                      { label: 'Time (Weeks)', value: row => blobs.setValueFromRow(row, 'weeks') },
+                    ],
+                  });
+                  blobs.all = new Blob([all], { type: 'text/csv;charset=utf-8' });
+                  FileSaver.saveAs(blobs.all, `${this.user.displayName} ${object.report.week_of}.csv`);
+                  swal('Export 1:1', 'WOWs Exported', 'success');
+                  break;
                 case 'wows':
                   const wows = ToCSV({ data: object.report.wows });
                   blobs.wows = new Blob([wows], { type: 'text/csv;charset=utf-8' });

@@ -38,6 +38,62 @@
 		color: #3c4488 !important;
 		font-size: 3rem;
 	}
+
+	#fp-nav ul li, .fp-slidesNav ul li {
+		margin: 0 7px 40px;
+	}
+
+	#fp-nav ul li, #fp-nav ul li:hover, #fp-nav ul li:hover a span {
+		width: 23px !important;
+		height: 23px !important;
+	}
+	#fp-nav ul li .fp-tooltip { top: 12px; }
+
+	#fp-nav ul li:hover a span { margin: -2px 0 0 -2px; }
+
+	#fp-nav ul li a.active span, #fp-nav ul li:hover a.active span, .fp-slidesNav ul li a.active span, .fp-slidesNav ul li:hover a.active span {
+		margin: -2px 0 0 -2px !important;
+	}
+
+	#fp-nav a[href^="#WOWs"] span, #fp-nav a[href^="#Serendipity"] span, #fp-nav a[href^="#Priorities"] span,
+	#fp-nav a[href^="#WOWs"].active span, #fp-nav a[href^="#Serendipity"].active span, #fp-nav a[href^="#Priorities"].active span {
+		width: 23px;
+		height: 23px;
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-color: transparent !important;
+	}
+	.fp-viewing-WOWs .fp-tooltip { color: #000000 !important; }
+	.fp-viewing-WOWs a[href^="#WOWs"] span {
+		background-image: url("../../assets/nav/wows_selected.png") !important;
+	}
+	.fp-viewing-WOWs a[href^="#Serendipity"] span {
+		background-image: url("../../assets/nav/serendipity_color.png") !important;
+	}
+	.fp-viewing-WOWs a[href^="#Priorities"] span {
+		background-image: url("../../assets/nav/priorities_color.png") !important;
+	}
+
+	.fp-viewing-Serendipity a[href^="#WOWs"] span {
+		background-image: url("../../assets/nav/wows.png") !important;
+	}
+	.fp-viewing-Serendipity a[href^="#Serendipity"] span {
+		background-image: url("../../assets/nav/serendipity_selected.png") !important;
+	}
+	.fp-viewing-Serendipity a[href^="#Priorities"] span{
+		background-image: url("../../assets/nav/priorities_white.png") !important;
+	}
+
+	.fp-viewing-Priorities a[href^="#WOWs"] span {
+		background-image: url("../../assets/nav/wows.png") !important;
+	}
+	.fp-viewing-Priorities a[href^="#Serendipity"] span {
+		background-image: url("../../assets/nav/serendipity_white.png") !important;
+	}
+	.fp-viewing-Priorities a[href^="#Priorities"] span {
+		background-image: url("../../assets/nav/priorities_selected.png") !important;
+	}
 </style>
 <script type="text/javascript">
   /* eslint-disable no-unused-vars,no-param-reassign */

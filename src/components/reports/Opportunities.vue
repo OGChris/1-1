@@ -6,16 +6,16 @@
 					<b-card class="custom-card pt-2">
 						<b-img center fluid :src="tableTop" alt="Image" class="custom-card-top pb-1"></b-img>
 						<h4 class="card-title">Serendipity</h4>
-						<h6 class="card-subtitle mb-2">Sharing challenges, learning from mistakes and finding opportunities in the in-between.</h6>
-						<b-input-group v-for="(opp, index) in $root.collection.opportunities" class="mb-2" :key="opp.id || index">
-							<b-textarea v-model="opp.text" :placeholder="`Area ${index+1}`"
-							            :rows="2" :max-rows="6" v-validate.initial="'max:100'" :data-vv-name="`opp${index}`"
+						<h6 class="card-subtitle mb-2">Sharing challenges. Learning from mistakes<br>and finding opportunities in the in-between.</h6>
+						<b-input-group size="sm" v-for="(opp, index) in $root.collection.opportunities" class="mb-2" :key="opp.id || index">
+							<b-textarea v-model="opp.text" :placeholder="`Area ${index+1}`" class="bg-transparent"
+							            :rows="1" :max-rows="6" v-validate.initial="'max:100'" :data-vv-name="`opp${index}`"
 							            :state="errors.has(`opp${index}`)?'invalid':''"></b-textarea>
 							<b-input-group-button>
-								<b-button @click="removeObj(index)" variant="danger"><i class="fa fa-trash"></i></b-button>
+								<b-button @click="removeObj(index)" variant="outline-secondary" style="border: 1px solid #ced4da;"><i class="fa fa-trash text-white"></i></b-button>
 							</b-input-group-button>
 						</b-input-group>
-						<b-btn block variant="outline-secondary" @click.prevent="addOpportunity"><i class="fa fa-plus"></i> Add Item</b-btn>
+						<b-btn block variant="outline-secondary" class="text-white" @click.prevent="addOpportunity"><i class="fa fa-plus"></i> Add Item</b-btn>
 						<!--<div slot="footer" class="justify-content-md-center">
 							<b-row>
 								<b-col cols="6" class="text-left">
@@ -55,7 +55,7 @@
 	.custom-card-top {
 		max-width: 115%;
 		position: absolute;
-		top: -95px;
+		top: -81px;
 		left: -8%;
 	}
 	.custom-card-bottom {
@@ -67,7 +67,7 @@
 
 	@media (max-width: 991px) {
 		.custom-card-top {
-			top: -69px;
+			top: -59px;
 			left: -8%;
 		}
 	}
@@ -89,14 +89,14 @@
         tableBottom,
       };
     },
-    computed: mapState(['user', 'currentReport']),
+    computed: mapState(['user']),
     watch: {
       user() { this.addOpportunity(); },
     },
     methods: {
       addOpportunity() {
         const obj = {
-          uid: this.user.uid,
+          // uid: this.user.uid,
           text: '',
         };
         this.$root.collection.opportunities.push(obj);

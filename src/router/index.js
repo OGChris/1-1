@@ -3,15 +3,11 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Hello from '@/components/Hello';
 
-// Forms
 import ReportWrapper from '@/components/reports/wrapper';
-// import Wows from '@/components/reports/Wows';
-// import Objectives from '@/components/reports/Objectives';
-// import Opportunities from '@/components/reports/Opportunities';
-// import StatusReports from '@/components/reports/StatusReports';
 import Review from '@/components/reports/Review';
 
 Vue.use(Router);
+
 // eslint-disable-next-line import/no-mutable-exports,prefer-const
 let router = new Router({
   mode: 'history',
@@ -28,6 +24,9 @@ let router = new Router({
     {
       path: '/reports/:week',
       component: ReportWrapper,
+      meta: {
+        requiresAuth: true,
+      },
       props: true,
       /* children: [
         {
@@ -84,11 +83,14 @@ let router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  let currentUser = window.firebaseApp.auth().currentUser;
-  let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  // requiresAdmin
-  if (requiresAuth && !currentUser) next('/');
-  else if (!requiresAuth && currentUser) next();
-  else next();
+  let currentUser = null;
+  this.a.app.$getItem('auth', (error, data) => {
+    if (data) currentUser = data;
+    let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+    // requiresAdmin
+    if (requiresAuth && !currentUser) next('/');
+    else if (!requiresAuth && currentUser) next();
+    else next();
+  });
 });
 export default router;

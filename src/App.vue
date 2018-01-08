@@ -11,10 +11,6 @@
 
 <script>
   import _ from 'underscore';
-  import swal from 'sweetalert';
-  import $ from 'jquery';
-  import moment from 'moment';
-  import Firebase from 'firebase';
 
   import { mapState } from 'vuex';
   import { TimelineMax, TweenMax, Power4 } from 'gsap';
@@ -47,58 +43,8 @@
         const fromDepth = from.path.split('/').length;
         this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left';
       },
-      /* user(val) {
-        // eslint-disable-next-line max-len
-        // const backgrounds = { AndreaBG, EthanBG, GinnyBG, HarpreetBG, JannekeBG, KeerththanaBG,
-        KeyanBG, KriskaBG, LeeBG, NayeonBG, OzgeBG, TomBG, YsabelBG };
-        // if (val && backgrounds) {
-        // const bg = _.find(backgrounds, item => item);
-        // eslint-disable-next-line max-len
-        // const bg = _.find(backgrounds, item => item.toLowerCase()
-        .includes(val.displayName.split(' ')[0].toLowerCase())) || JannekeBG;
-        // if (bg) this.changeBackground(bg);
-        // }
-      }, */
-    },
-    beforeCreate() {
-      const self = this;
-      Firebase.auth().onAuthStateChanged((user) => {
-        // initially user = null, after auth it will be either <fb_user> or false
-        self.$store.commit('setUser', user || false);
-        if (user) {
-          // get user metadata, check for admin
-          self.$root.fbDatabase.collection('users').doc(user.uid).get().then((doc) => {
-            self.$root.isAdmin = doc.data().admin;
-          });
-          // get current report for user filter by week first to limit results then filter by uid
-          self.$root.fbDatabase.collection('reports')
-            .where('week_of', '==', localStorage.SelectedWeek || moment().format('YYYY-[W]ww'))
-            .where('uid', '==', user.uid).limit(1)
-            .get()
-            .then((querySnapshot) => {
-              querySnapshot.forEach((doc) => {
-                if (doc.exists) {
-                  this.$store.commit('setCurrentReport', doc);
-                }
-              });
-            })
-            .catch((error) => {
-              swal('Something went wrong!', error, 'error');
-            });
-        }
-      });
     },
     methods: {
-      changeBackground(bg) {
-        const html = $('html');
-        html.css('background-image', `url("${bg}")`);
-        html.css('background-color', '#FFFFFF');
-        html.css('background-position', 'center bottom');
-        localStorage.OverideBackground = true;
-        localStorage.SelectedBackground = bg;
-        this.activeBackground = bg;
-      },
-
       enter(el, done) {
         const tl = new TimelineMax({
           // id: 'Page Enter',
@@ -147,7 +93,7 @@
   };
 </script>
 <style lang="scss">
-	@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400');
+	@import url('https://fonts.googleapis.com/css?family=Open+Sans:200,300,400');
 
 	/*
      * Globals
@@ -169,7 +115,7 @@
 	html,
 	body {
 		font-family: 'Open Sans', sans-serif;
-		font-weight: 300;
+		font-weight: 200;
 		min-height: 100%;
 		height: -webkit-fill-available;
 		height: -moz-fill-available;
@@ -225,6 +171,36 @@
 		transform: translate(-50%, 0);
 	}
 
+	.btn {
+		font-weight: 200;
+		padding: 0.175rem 0.575rem;
+	}
+
+	.form-control {
+		padding: 0.175rem 0.575rem;
+	}
+	.input-group-sm textarea.form-control {
+		line-height: 1.75rem;
+	}
+
+	.input-group-addon {
+		background-color: transparent;
+	}
+
+	h4, h5, h6 {
+		font-weight: 200;
+	}
+	.vdp-datepicker__calendar {
+		font-size: 1.25rem;
+	}
+	.vdp-datepicker__calendar .cell.highlighted {
+		/*background: #cae5ed;*/
+		background: #a08eaf !important;
+	}
+	.vdp-datepicker__calendar .cell.selected, .vdp-datepicker__calendar .cell.selected.highlighted, .vdp-datepicker__calendar .cell.selected:hover {
+		/*background: #4bd !important;*/
+		background: #9170ae !important;
+	}
 	/*
 	 * Cover
 	 */
@@ -243,7 +219,7 @@
 	 */
 
 	.mastfoot {
-		color: rgba(255, 255, 255, .5);
+		display: none;
 	}
 
 	/*
@@ -284,7 +260,12 @@
 	}
 
 	@media print {
-		#nav_collapse, .navbar-toggler, .dropdown-menu, .card-footer, .review-edit-btn { display: none !important;}
+		.masthead, .dropdown-menu, .card-footer, .review-edit-btn { display: none !important;}
+		.mastfoot { display: block; }
+		.card { border: none; }
+		.card-body { padding: 0 }
+		.review-container { padding-top: 0 !important; margin-left: 0; flex: 0 0 66.666667%; max-width: 100% }
+		.wows-section { padding-top: 3rem;}
 	}
 
 	/*

@@ -3,30 +3,20 @@
 		<b-container>
 			<b-row>
 				<div class="offset-md-4 offset-xs-3 col-md-8 col-xs-9 align-self-center mt-5 mb-5">
-					<b-card title="WOWs" sub-title="Key wins, stuff I accomplished since last meeting, things I’m proud of having worked on." header-text-variant="primary" class="mb-2 custom-card">
-						<b-input-group v-for="(wow, index) in $root.collection.wows" class="mb-2" :key="wow.id || index">
+					<b-card title="WOWs" sub-title="Win of the week. Stuff I accomplished since last meeting. Things I’m proud of having worked on." header-text-variant="primary" class="mb-2 custom-card">
+
+							<b-input-group size="sm" v-for="(wow, index) in $root.collection.wows" class="mb-2" :key="wow.id || index">
 							<b-input-group-addon>
 								{{index+1}}.
 							</b-input-group-addon>
-							<b-textarea v-model="wow.text" :placeholder="`WOW ${index+1}`" style="min-height: 38px;"
+							<b-textarea class="border-left-0" v-model="wow.text" :placeholder="`WOW ${index+1}`" style="min-height: 38px;"
 							            :rows="1" :max-rows="6" v-validate.initial="'max:100'" :data-vv-name="`wow${index}`"
 							            :state="errors.has(`wow${index}`)?'invalid':''" v-autosize="wow.text"></b-textarea>
 							<b-input-group-button>
-								<b-button @click="removeObj(index)" variant="danger"><i class="fa fa-trash"></i></b-button>
+								<b-button @click="removeObj(index)" variant="link" style="border: 1px solid #ced4da;"><i class="fa fa-trash"></i></b-button>
 							</b-input-group-button>
 						</b-input-group>
 						<b-btn block variant="outline-secondary" @click.prevent="addWow"><i class="fa fa-plus"></i> Add WOW</b-btn>
-
-						<!--<div slot="footer">
-							<b-row class="justify-content-md-center">
-								<b-col cols="6" class="text-left">
-
-								</b-col>
-								<b-col cols="6" class="text-right">
-									<b-btn :disabled="errors.any()" to="Objectives" variant="success">Next</b-btn>
-								</b-col>
-							</b-row>
-						</div>-->
 					</b-card>
 				</div>
 			</b-row>
@@ -35,7 +25,7 @@
 </template>
 <style scoped>
 	.inner-wrapper {
-		background: url('../../assets/bg/bg_01.png') no-repeat center center;
+		background: url('../../assets/bg/bg_01.jpg') no-repeat center center;
 		background-size: contain;
 	}
 	.custom-card {
@@ -48,31 +38,44 @@
 	}
 	.custom-card:before {
 		content: '';
+		background: transparent url('../../assets/chat_bubble_corner.png') no-repeat center center;
 		position: absolute;
-		left: 0;
+		left: -120px;
 		top: 40%;
-		width: 0;
-		height: 0;
-		border: 50px solid transparent;
-		border-right-color: #3c4488;
-		/* border-bottom: 0; */
-		border-left: 0;
-		margin-left: -52px;
-		margin-top: 0;
+		width: 120px;
+		height: 149px;
+		background-size: contain;
 	}
+	@media (max-width: 1200px) {
+		.custom-card:before {
+			left: -104px;
+			top: 50%;
+			width: 120px;
+			height: 80px;
+		}
+	}
+	@media (max-width: 991px) {
+		.custom-card:before {
+			left: -104px;
+			top: 55%;
+			width: 120px;
+			height: 80px;
+		}
+	}
+
 	.custom-card:after {
-		content: '';
-		position: absolute;
-		left: 0;
-		top: 40%;
-		width: 0;
-		height: 0;
-		border: 50px solid transparent;
-		border-right-color: #fff;
-		/* border-bottom: 0; */
-		border-left: 0;
-		margin-left: -49px;
-		margin-top: 0;
+		/*content: '';*/
+		/*position: absolute;*/
+		/*left: 0;*/
+		/*top: 40%;*/
+		/*width: 0;*/
+		/*height: 0;*/
+		/*border: 50px solid transparent;*/
+		/*border-right-color: #fff;*/
+		/*!* border-bottom: 0; *!*/
+		/*border-left: 0;*/
+		/*margin-left: -49px;*/
+		/*margin-top: 0;*/
 	}
 </style>
 <script type="text/javascript">
@@ -84,14 +87,14 @@
     data() {
       return {};
     },
-    computed: mapState(['user', 'currentReport']),
+    computed: mapState(['user']),
     watch: {
       user() { this.addWow(); },
     },
     methods: {
       addWow() {
         const obj = {
-          uid: this.user.uid,
+          // uid: this.user.uid,
           text: '',
           // media: '',
         };

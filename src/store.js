@@ -20,8 +20,5 @@ export default new Vuex.Store({
     setCurrentReport(state, value) {
       state.currentReport = value;
     },
-    // setFirebaseApp(state, value) {
-    //   state.firebaseApp = value;
-    // },
   },
 });

@@ -1,77 +1,21 @@
 <template>
 	<b-row class="wrapper" align-v="center">
-		<b-col align-self="center" class="offset-sm-2 col-md-8 col-xs-12 mt-5">
+		<b-col align-self="center" class=" col-xs-12 mt-5" :class="[user ? 'offset-sm-3 col-md-6' : 'offset-sm-2 col-md-8']">
 			<div class="hello">
 				<template v-if="!user">
 					<h1 class="text-white">{{ heading }}</h1>
-					<!--<template v-if="showAvatarLogin">-->
-						<b-card>
-							<h4 class="card-title" style="color: #3c4488;font-size: 3rem;font-weight: 300;">Select your Avatar</h4>
-							<b-btn variant="outline-primary" class="m-1" v-for="(avatar, key) in avatars" :key="key" @click="loginAvatarSelected(key)">
-								<b-img :src="avatar" rounded="circle" width="50" height="50" blank-color="#777" alt="img" class="m-1" />
-								<br>{{ key }}
+					<b-card>
+							<h4 class="card-title" style="color: #3c4488;font-size: 2.5rem;font-weight: 200;">Select your avatar</h4>
+							<br>
+							<b-btn variant="link" class="p-0 text-dark" style="cursor: pointer; font-weight: 200;" v-for="(avatar, key) in avatars" :key="key" @click="loginAvatarSelected(key)">
+								<b-img :src="avatar" rounded="circle" width="75" height="75" blank-color="#777" alt="img" class="m-1" /><br>{{ key }}
 							</b-btn>
-
 							<!--<div class="text-center">
 								<p class="text-center">If you do not see your avatar</p>
 								<b-btn variant="secondary">Login with email and password</b-btn>
 							</div>-->
 						</b-card>
-					<!--</template>-->
-					<!--<template v-else>
-						<b-card no-body>
-							<b-tabs small card ref="tabs" class="nav-fill" v-model="tabIndex">
-
-								<b-tab title="Login">
-									<b-form id="login" @submit.prevent="login" data-vv-scope="login">
-										<b-form-group id="login-email-group" label-for="login-email">
-											<b-form-input v-model="loginData.email" id="login-email" type="email"
-											              placeholder="Enter your email"></b-form-input>
-										</b-form-group>
-										<b-form-group id="login-password-group" label-for="login-password">
-											<b-form-input v-model="loginData.password" id="login-password" type="password"
-											              placeholder="Enter your password"></b-form-input>
-										</b-form-group>
-										<b-button type="submit" variant="primary">Log In</b-button>
-									</b-form>
-								</b-tab>
-
-								<b-tab title="Register">
-									<b-form id="register" @submit.prevent="register" data-vv-scope="register">
-										<b-form-group id="register-name-group" label-for="register-name" class="text-left">
-											<label for="register-name">Enter your name</label>
-											<b-form-input v-model="registerData.displayName" id="register-name" type="text"
-											              required placeholder="Jane Doe"></b-form-input>
-										</b-form-group>
-										<b-form-group id="register-email-group" label-for="register-email" class="text-left">
-											<label for="register-email">Enter your email</label>
-											<b-form-input v-model="registerData.email" id="register-email" type="email"
-											              required placeholder="abc@orangegate.ca"></b-form-input>
-										</b-form-group>
-										<b-form-group id="register-password-group" label-for="register-password" class="text-left">
-											<label for="register-password">Enter your password</label>
-											<b-form-input v-model="registerData.password" id="register-password"
-											              type="password" required
-											              placeholder="******"></b-form-input>
-										</b-form-group>
-										<b-form-group>
-											<label for="radios2">Select your Avatar</label>
-											<b-form-radio-group id="radios2" buttons button-variant="outline-primary"
-											                    style="flex-wrap: wrap;justify-content: center;"
-											                    v-model="registerData.photoURL" name="avatars" required>
-												<b-form-radio v-for="(avatar, key) in avatars" :key="key" :value="avatar">
-													<b-img :src="avatar" rounded="circle" width="50" height="50" blank-color="#777" alt="img" class="m-1" />
-												</b-form-radio>
-											</b-form-radio-group>
-										</b-form-group>
-										<b-button type="submit" variant="primary">Register</b-button>
-									</b-form>
-								</b-tab>
-							</b-tabs>
-						</b-card>
-					</template>-->
-
-					<b-modal ref="avatarLoginModal" title="Authentication" @ok="login">
+					<b-modal centered ref="avatarLoginModal" title="Authentication" @ok="login">
 						<div v-if="selectedLoginAvatar">
 							<img :src="selectedLoginAvatar && selectedLoginAvatar.photoURL ? selectedLoginAvatar.photoURL : defaultAvatar" height="32" class="rounded-circle"
 							     alt="Avatar">
@@ -128,14 +72,14 @@
 
 				</template>
 				<template v-else>
-					<h1 class="" style="color: #3c4488;font-size: 3rem;font-weight: 300;">Welcome Back
-						<template v-if="user.displayName">, {{user.displayName}}!</template>
+					<h1 class="" style="color: #3c4488;font-size: 2.5rem;font-weight: 300;">
+						Welcome Back, <template v-if="user.displayName">{{user.displayName}}!</template>
 					</h1>
 					<br>
 					<b-form @submit.prevent="beginReport" novalidate>
 						<!--<label for="reportWeek">Week</label>-->
-						<b-input-group size="lg">
-							<b-input-group-addon><i class="fa fa-calendar"></i></b-input-group-addon>
+						<b-input-group size="sm">
+							<b-input-group-addon><i class="fa fa-calendar" style="color: blue;"></i></b-input-group-addon>
 							<!--<b-input id="reportWeek" type="week" v-model="weekOf" min="minWeek" max="maxWeek" required
 								v-validate="'required'" name="reportWeek" @input="weekChanged"></b-input>-->
 							<datepicker :format="customFormatter" wrapper-class="form-control" input-class="dp-input" v-model="weekOfObj" :highlighted="highlightedDates" @selected="weekOfSelected"></datepicker>
@@ -195,6 +139,8 @@
   import _ from 'underscore';
   import { mapState } from 'vuex';
   import moment from 'moment';
+  import authData from '../auth.json';
+
   import Andrea from '../assets/avatar/Andrea.png';
   import Ethan from '../assets/avatar/Ethan.png';
   import Ginny from '../assets/avatar/Ginny.png';
@@ -240,7 +186,7 @@
         defaultAvatar: this.$root.defaultAvatar,
         // eslint-disable-next-line max-len
         avatars: { Andrea, Ethan, Ginny, Harpreet, Janneke, Keerththana, Keyan, Kriska, Lee, Nayeon, Ozge, Tom, Ysabel, Jerez: this.$root.defaultAvatar, Demo: this.$root.defaultAvatar },
-        loginAvatars: [],
+        loginAvatars: authData.data,
         selectedLoginAvatar: null,
       };
     },
@@ -252,13 +198,6 @@
     },
     methods: {
       // AVATAR LOGIN
-      loadLoginAvatars() {
-        this.$root.fbDatabase.collection('users').get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            this.loginAvatars.push(_.extend({ id: doc.id }, doc.data()));
-          });
-        });
-      },
       loginAvatarSelected(key) {
         // eslint-disable-next-line max-len
         const account = _.find(this.loginAvatars, user => (user.displayName && user.displayName.includes(key)) || (user.photoURL && user.photoURL.includes(key)));
@@ -278,25 +217,20 @@
         event.preventDefault();
         const self = this;
         this.loading = true;
-        this.$root.fbAuth
-          .signInWithEmailAndPassword(this.loginData.email, this.loginData.password)
-          .then((response) => {
-            self.$root.fbDatabase.collection('users').doc(response.uid).update({
-              // photoURL: response.photoURL,
-              email: response.email,
-              displayName: response.displayName,
-            });
+        const account = _.find(this.loginAvatars, user => user.email === this.loginData.email);
+        if (account) {
+          if (account.password === this.loginData.password) {
             this.$refs.avatarLoginModal.hide();
+            self.$store.commit('setUser', account);
+            self.$setItem('auth', account);
             this.loading = false;
-          })
-          .catch((response) => {
-            this.loginError = response;
-          });
+          }
+        }
       },
       register() {
-        const self = this;
+        // const self = this;
         this.loading = true;
-        this.$root.fbAuth
+        /* this.$root.fbAuth
           .createUserWithEmailAndPassword(this.registerData.email, this.registerData.password)
           .then((user) => {
             self.$root.fbAuth.currentUser.updateProfile({
@@ -314,14 +248,14 @@
               self.loading = false;
             }).catch(self.authErrorHandler);
           })
-          .catch(this.authErrorHandler);
+          .catch(this.authErrorHandler); */
       },
       requestPasswordReset() {
         swal('Forgot Your Password?', 'Would you like to reset it?', 'info', {
           button: 'Yes',
         }).then((value) => {
           if (value) {
-            this.$root.fbAuth.sendPasswordResetEmail(this.loginData.email)
+            /* this.$root.fbAuth.sendPasswordResetEmail(this.loginData.email)
               .then(() => {
                 swal('Password reset email sent!', 'Please check your email.', 'success');
                 // Password reset email sent.
@@ -329,7 +263,7 @@
               .catch((error) => {
                 swal('Something went wrong', error, 'error');
                 // Error occurred. Inspect error.code.
-              });
+              }); */
           }
         });
       },
@@ -391,9 +325,7 @@
       },
     },
     mounted() {
-      if (!this.user) {
-        this.loadLoginAvatars();
-      } else {
+      if (this.user) {
         this.checkForRecord();
       }
     },
