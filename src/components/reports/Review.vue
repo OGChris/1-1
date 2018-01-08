@@ -85,8 +85,15 @@
 		color: #3c4488 !important;
 		font-size: 3rem;
 	}
+
 	.review-container {
-		padding-top: 4rem;
+		padding-top: 7rem;
+	}
+
+	@media print {
+		.review-container {
+			padding-top: 0;
+		}
 	}
 </style>
 <script type="text/javascript">
