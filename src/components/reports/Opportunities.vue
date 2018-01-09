@@ -8,7 +8,7 @@
 						<h4 class="card-title">Serendipity</h4>
 						<h6 class="card-subtitle mb-2">Sharing challenges. Learning from mistakes<br>and finding opportunities in the in-between.</h6>
 						<b-input-group size="sm" v-for="(opp, index) in $root.collection.opportunities" class="mb-2" :key="opp.id || index">
-							<b-textarea v-model="opp.text" :placeholder="`Area ${index+1}`" class="bg-transparent"
+							<b-textarea v-model="opp.text" :placeholder="`Area ${index+1}`" class="bg-transparent text-white"
 							            :rows="1" :max-rows="6" v-validate.initial="'max:100'" :data-vv-name="`opp${index}`"
 							            :state="errors.has(`opp${index}`)?'invalid':''"></b-textarea>
 							<b-input-group-button>

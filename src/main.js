@@ -9,6 +9,9 @@ import 'font-awesome/css/font-awesome.min.css';
 import 'fullpage.js/dist/jquery.fullpage.min.css';
 
 import Vue from 'vue';
+import Firebase from 'firebase';
+import VueFire from 'vuefire';
+
 import vSelect from 'vue-select';
 import VeeValidate from 'vee-validate';
 import BootstrapVue from 'bootstrap-vue';
@@ -22,6 +25,7 @@ import App from './App';
 import sharedHeader from './components/shared/header';
 import router from './router';
 import Janneke from './assets/avatar/Janneke.png';
+import firebaseConfig from './firebase';
 
 // Required for side-effects
 window.jQuery = $;
@@ -31,6 +35,14 @@ window.IScroll = require('iscroll');
 require('fullpage.js/vendors/scrolloverflow.min');
 require('fullpage.js');
 
+const firebaseApp = Firebase.initializeApp(firebaseConfig);
+window.firebaseApp = firebaseApp;
+// const db = firebaseApp.database();
+const db = firebaseApp.firestore();
+const fbAuth = firebaseApp.auth();
+
+let ogApp;
+Vue.use(VueFire);
 Vue.use(VueLocalForage);
 Vue.use(BootstrapVue);
 Vue.use(VeeValidate);
@@ -51,45 +63,61 @@ Vue.filter('mWeekToRange', (value) => {
 });
 
 Vue.config.productionTip = false;
-
-const ogApp = new Vue({
-  el: '#app',
-  router,
-  store,
-  template: '<App/>',
-  components: { App },
-  data() {
-    return {
-      defaultAvatar: Janneke,
-      user: null,
-      isAdmin: false,
-      collection: {
-        weekOf: null,
-        wows: [],
-        objectives: [],
-        opportunities: [],
-      },
-    };
-  },
-  watch: {
-    collection: {
-      deep: true,
-      handler(val) {
-        if ($.fn.fullpage && $.fn.fullpage.reBuild) $.fn.fullpage.reBuild();
-        this.$setItem(val.weekOf, val);
-      },
+Vue.mixin({
+  methods: {
+    getServerTimestamp() {
+      const fireBase = Firebase;
+      return fireBase.firestore.FieldValue.serverTimestamp();
     },
   },
-  mounted() {
-    this.$storageConfig({
-      // driver: localforage.LOCALSTORAGE,
-      name: 'orangegate',
-      storeName: 'og1_1',
+});
+
+fbAuth.onAuthStateChanged(() => {
+  if (!ogApp) {
+    ogApp = new Vue({
+      el: '#app',
+      router,
+      store,
+      template: '<App/>',
+      components: { App },
+      data() {
+        return {
+          fbAuth,
+          fbDatabase: db,
+          defaultAvatar: Janneke,
+          user: null,
+          isAdmin: false,
+          collection: {
+            weekOf: null,
+            wows: [],
+            objectives: [],
+            opportunities: [],
+          },
+        };
+      },
+      watch: {
+        collection: {
+          deep: true,
+          handler(val) {
+            if ($.fn.fullpage && $.fn.fullpage.reBuild) $.fn.fullpage.reBuild();
+            this.$setItem(val.weekOf, val);
+          },
+        },
+      },
+      mounted() {
+        this.$storageConfig({
+          // driver: localforage.LOCALSTORAGE,
+          name: 'orangegate',
+          storeName: 'og1_1',
+        });
+        this.$getItem('auth', (error, data) => {
+          if (data) {
+            this.$store.commit('setUser', data);
+          }
+        });
+      },
     });
-    this.$getItem('auth', (error, data) => {
-      if (data) {
-        this.$store.commit('setUser', data);
-      }
-    });
-  },
+  } else {
+    // debugger;
+  }
 });

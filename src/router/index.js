@@ -83,7 +83,15 @@ let router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  let currentUser = null;
+  // For Firebase Auth
+  let currentUser = window.firebaseApp.auth().currentUser;
+  let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  // requiresAdmin
+  if (requiresAuth && !currentUser) next('/');
+  else if (!requiresAuth && currentUser) next();
+  else next();
+  // For JSON Auth
+  /* let currentUser = null;
   this.a.app.$getItem('auth', (error, data) => {
     if (data) currentUser = data;
     let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
@@ -91,6 +99,6 @@ router.beforeEach((to, from, next) => {
     if (requiresAuth && !currentUser) next('/');
     else if (!requiresAuth && currentUser) next();
     else next();
-  });
+  }); */
 });
 export default router;

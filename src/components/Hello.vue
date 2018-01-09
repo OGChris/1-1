@@ -139,7 +139,8 @@
   import _ from 'underscore';
   import { mapState } from 'vuex';
   import moment from 'moment';
-  import authData from '../auth.json';
+  // For JSON Auth
+  // import authData from '../auth.json';
 
   import Andrea from '../assets/avatar/Andrea.png';
   import Ethan from '../assets/avatar/Ethan.png';
@@ -166,8 +167,8 @@
         heading: 'Welcome to 1:1',
         minWeek: moment().subtract(1, 'weeks').format('YYYY-[W]ww'),
         maxWeek: moment().add(1, 'weeks').format('YYYY-[W]ww'),
-        weekOf: localStorage.SelectedWeek || moment().format('YYYY-[W]ww'),
-        weekOfObj: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() : moment().day('Monday').toDate(),
+        weekOf: !isNaN(localStorage.SelectedWeek) ? localStorage.SelectedWeek : moment().format('YYYY-[W]ww'),
+        weekOfObj: !isNaN(localStorage.SelectedWeek) ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() : moment().day('Monday').toDate(),
         highlightedDates: {
           from: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() : moment().day('Monday').toDate(),
           to: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Friday').toDate() : moment().day('Friday').toDate(),
@@ -186,7 +187,7 @@
         defaultAvatar: this.$root.defaultAvatar,
         // eslint-disable-next-line max-len
         avatars: { Andrea, Ethan, Ginny, Harpreet, Janneke, Keerththana, Keyan, Kriska, Lee, Nayeon, Ozge, Tom, Ysabel, Jerez: this.$root.defaultAvatar, Demo: this.$root.defaultAvatar },
-        loginAvatars: authData.data,
+        loginAvatars: [], // authData.data,
         selectedLoginAvatar: null,
       };
     },
@@ -197,7 +198,14 @@
       },
     },
     methods: {
-      // AVATAR LOGIN
+      // Firebase AVATAR LOGIN
+      loadLoginAvatars() {
+        this.$root.fbDatabase.collection('users').get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.loginAvatars.push(_.extend({ id: doc.id }, doc.data()));
+          });
+        });
+      },
       loginAvatarSelected(key) {
         // eslint-disable-next-line max-len
         const account = _.find(this.loginAvatars, user => (user.displayName && user.displayName.includes(key)) || (user.photoURL && user.photoURL.includes(key)));
@@ -213,26 +221,50 @@
         }
       },
       login(event) {
+        // For FIREBASE Auth
         this.loginError = null;
         event.preventDefault();
         const self = this;
         this.loading = true;
-        const account = _.find(this.loginAvatars, user => user.email === this.loginData.email);
-        if (account) {
-          if (account.password === this.loginData.password) {
+        this.$root.fbAuth
+          .signInWithEmailAndPassword(this.loginData.email, this.loginData.password)
+          .then((response) => {
+            self.$root.fbDatabase.collection('users').doc(response.uid).update({
+              // photoURL: response.photoURL,
+              email: response.email,
+              displayName: response.displayName,
+            });
             this.$refs.avatarLoginModal.hide();
-            self.$store.commit('setUser', account);
-            self.$setItem('auth', account);
             this.loading = false;
-          } else {
-            this.loginError = { code: 'auth/wrong-password', message: 'Incorrect password. Please check you credentials.' };
-          }
-        }
+          })
+          .catch((response) => {
+            this.loginError = response;
+          });
+        // For JSON Auth
+        // this.loginError = null;
+        // event.preventDefault();
+        // const self = this;
+        // this.loading = true;
+        // const account = _.find(this.loginAvatars, user => user.email === this.loginData.email);
+        // if (account) {
+        //   if (account.password === this.loginData.password) {
+        //     this.$refs.avatarLoginModal.hide();
+        //     self.$store.commit('setUser', account);
+        //     self.$setItem('auth', account);
+        //     this.loading = false;
+        //   } else {
+        //     this.loginError = {
+        //       code: 'auth/wrong-password',
+        //       message: 'Incorrect password. Please check you credentials.'
+        //     };
+        //   }
+        // }
       },
+      // For FIREBASE Auth
       register() {
         // const self = this;
         this.loading = true;
-        /* this.$root.fbAuth
+        this.$root.fbAuth
           .createUserWithEmailAndPassword(this.registerData.email, this.registerData.password)
           .then((user) => {
             self.$root.fbAuth.currentUser.updateProfile({
@@ -250,14 +282,15 @@
               self.loading = false;
             }).catch(self.authErrorHandler);
           })
-          .catch(this.authErrorHandler); */
+          .catch(this.authErrorHandler);
       },
+      // For FIREBASE Auth
       requestPasswordReset() {
         swal('Forgot Your Password?', 'Would you like to reset it?', 'info', {
           button: 'Yes',
         }).then((value) => {
           if (value) {
-            /* this.$root.fbAuth.sendPasswordResetEmail(this.loginData.email)
+            this.$root.fbAuth.sendPasswordResetEmail(this.loginData.email)
               .then(() => {
                 swal('Password reset email sent!', 'Please check your email.', 'success');
                 // Password reset email sent.
@@ -265,7 +298,7 @@
               .catch((error) => {
                 swal('Something went wrong', error, 'error');
                 // Error occurred. Inspect error.code.
-              }); */
+              });
           }
         });
       },
@@ -327,9 +360,15 @@
       },
     },
     mounted() {
-      if (this.user) {
+      if (!this.user) {
+        this.loadLoginAvatars();
+      } else {
         this.checkForRecord();
       }
+      // FOR JSON Auth
+      // if (this.user) {
+      //   this.checkForRecord();
+      // }
     },
   };
 </script>

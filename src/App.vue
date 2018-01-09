@@ -11,6 +11,9 @@
 
 <script>
   import _ from 'underscore';
+  import swal from 'sweetalert';
+  import moment from 'moment';
+  import Firebase from 'firebase';
 
   import { mapState } from 'vuex';
   import { TimelineMax, TweenMax, Power4 } from 'gsap';
@@ -43,6 +46,34 @@
         const fromDepth = from.path.split('/').length;
         this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left';
       },
+    },
+    beforeCreate() {
+      const self = this;
+      Firebase.auth().onAuthStateChanged((user) => {
+        // initially user = null, after auth it will be either <fb_user> or false
+        self.$store.commit('setUser', user || false);
+        if (user) {
+          // get user metadata, check for admin
+          self.$root.fbDatabase.collection('users').doc(user.uid).get().then((doc) => {
+            self.$root.isAdmin = doc.data().admin;
+          });
+          // get current report for user filter by week first to limit results then filter by uid
+          self.$root.fbDatabase.collection('reports')
+            .where('week_of', '==', localStorage.SelectedWeek || moment().format('YYYY-[W]ww'))
+            .where('uid', '==', user.uid).limit(1)
+            .get()
+            .then((querySnapshot) => {
+              querySnapshot.forEach((doc) => {
+                if (doc.exists) {
+                  this.$store.commit('setCurrentReport', doc);
+                }
+              });
+            })
+            .catch((error) => {
+              swal('Something went wrong!', error, 'error');
+            });
+        }
+      });
     },
     methods: {
       enter(el, done) {
