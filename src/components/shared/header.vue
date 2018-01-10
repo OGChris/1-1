@@ -68,8 +68,14 @@
     computed: mapState(['user', 'week']),
     methods: {
       signOut() {
-        this.$removeItem('auth');
-        window.location.reload();
+        this.$root.fbAuth.signOut().then(() => {
+          // Sign-out successful.
+          window.location.reload();
+        }).catch(() => {
+          // An error happened.
+        });
+        // this.$removeItem('auth');
+        // window.location.reload();
       },
     },
     mounted() {

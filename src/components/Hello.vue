@@ -146,6 +146,7 @@
   import Ethan from '../assets/avatar/Ethan.png';
   import Ginny from '../assets/avatar/Ginny.png';
   import Harpreet from '../assets/avatar/Harpreet.png';
+  import Jacob from '../assets/avatar/Jacob.png';
   import Janneke from '../assets/avatar/Janneke.png';
   import Keerththana from '../assets/avatar/Keerththana.png';
   import Keyan from '../assets/avatar/Keyan.png';
@@ -186,7 +187,7 @@
         },
         defaultAvatar: this.$root.defaultAvatar,
         // eslint-disable-next-line max-len
-        avatars: { Andrea, Ethan, Ginny, Harpreet, Janneke, Keerththana, Keyan, Kriska, Lee, Nayeon, Ozge, Tom, Ysabel, Jerez: this.$root.defaultAvatar, Demo: this.$root.defaultAvatar },
+        avatars: { Andrea, Ethan, Ginny, Harpreet, Jacob, Janneke, Keerththana, Keyan, Kriska, Lee, Nayeon, Ozge, Tom, Ysabel, Jerez: this.$root.defaultAvatar, Demo: this.$root.defaultAvatar },
         loginAvatars: [], // authData.data,
         selectedLoginAvatar: null,
       };
