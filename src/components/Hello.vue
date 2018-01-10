@@ -38,7 +38,7 @@
 						</b-form>
 					</b-modal>
 
-					<b-modal ref="avatarRegisterModal" title="Register" @shown="$refs.focusThis.focus()" @ok="register">
+					<b-modal centered ref="avatarRegisterModal" title="Register" @shown="$refs.focusThis.focus()" @ok="register">
 						<b-form id="register" data-vv-scope="register">
 							<b-form-group id="register-name-group" label-for="register-name" class="text-left">
 								<label for="register-name">Enter your name</label>
