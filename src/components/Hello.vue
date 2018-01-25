@@ -200,8 +200,8 @@
         heading: 'Welcome to 1:1',
         minWeek: moment().subtract(1, 'weeks').format('YYYY-[W]ww'),
         maxWeek: moment().add(1, 'weeks').format('YYYY-[W]ww'),
-        weekOf: localStorage.SelectedWeek || moment().format('YYYY-[W]ww'),
-        weekOfObj: moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() || moment().day('Monday').toDate(),
+        weekOf: !isNaN(localStorage.SelectedWeek) ? localStorage.SelectedWeek : moment().format('YYYY-[W]ww'),
+        weekOfObj: !isNaN(localStorage.SelectedWeek) ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() : moment().day('Monday').toDate(),
         highlightedDates: {
           from: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Monday').toDate() : moment().day('Monday').toDate(),
           to: localStorage.SelectedWeek ? moment(localStorage.SelectedWeek, 'YYYY-[W]ww').day('Friday').toDate() : moment().day('Friday').toDate(),
