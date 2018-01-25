@@ -34,7 +34,7 @@
 									<p v-else v-text="loginError.message"></p>
 								</template>
 							</b-form-group>
-							<!--<b-btn variant="outline-secondary" @click.prevent="requestPasswordReset">Forgot your password?</b-btn>-->
+							<b-btn variant="outline-secondary" @click.prevent="requestPasswordReset">Forgot your password?</b-btn>
 						</b-form>
 					</b-modal>
 
@@ -263,7 +263,7 @@
       },
       // For FIREBASE Auth
       register() {
-        // const self = this;
+        const self = this;
         this.loading = true;
         this.$root.fbAuth
           .createUserWithEmailAndPassword(this.registerData.email, this.registerData.password)

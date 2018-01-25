@@ -54,8 +54,8 @@
         self.$store.commit('setUser', user || false);
         if (user) {
           // get user metadata, check for admin
-          self.$root.fbDatabase.collection('users').doc(user.uid).get().then((doc) => {
-            self.$root.isAdmin = doc.data().admin;
+          self.$root.fbDatabase.collection('users').doc(user.uid).get().then(() => {
+            // self.$root.isAdmin = doc.data().admin;
           });
           // get current report for user filter by week first to limit results then filter by uid
           self.$root.fbDatabase.collection('reports')
