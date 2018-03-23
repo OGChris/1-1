@@ -211,7 +211,7 @@
                   });
                   blobs.all = new Blob([all], { type: 'text/csv;charset=utf-8' });
                   FileSaver.saveAs(blobs.all, `${this.user.displayName} ${object.report.week_of}.csv`);
-                  swal('Export 1:1', 'WOWs Exported', 'success');
+                  swal('Export 1:1', 'All Exported', 'success');
                   break;
                 case 'wows':
                   const wows = ToCSV({ data: object.report.wows });

@@ -142,7 +142,7 @@
   // For JSON Auth
   // import authData from '../auth.json';
 
-  import Andrea from '../assets/avatar/Andrea.png';
+  // import Andrea from '../assets/avatar/Andrea.png';
   import Ethan from '../assets/avatar/Ethan.png';
   import Ginny from '../assets/avatar/Ginny.png';
   import Harpreet from '../assets/avatar/Harpreet.png';
@@ -155,7 +155,7 @@
   import Nayeon from '../assets/avatar/Nayeon.png';
   import Ozge from '../assets/avatar/Ozge.png';
   import Tom from '../assets/avatar/tom.png';
-  import Ysabel from '../assets/avatar/Ysabel NEW.png';
+  // import Ysabel from '../assets/avatar/Ysabel NEW.png';
 
   export default {
     name: 'hello',
@@ -187,7 +187,7 @@
         },
         defaultAvatar: this.$root.defaultAvatar,
         // eslint-disable-next-line max-len
-        avatars: { Andrea, Ethan, Ginny, Harpreet, Jacob, Janneke, Keerththana, Keyan, Kriska, Lee, Nayeon, Ozge, Tom, Ysabel, Jerez: this.$root.defaultAvatar, Demo: this.$root.defaultAvatar },
+        avatars: { Ethan, Ginny, Harpreet, Jacob, Janneke, Keerththana, Keyan, Kriska, Lee, Nayeon, Ozge, Tom, Demo: this.$root.defaultAvatar, Jerez: this.$root.defaultAvatar },
         loginAvatars: [], // authData.data,
         selectedLoginAvatar: null,
       };
